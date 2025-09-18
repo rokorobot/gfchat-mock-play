@@ -45,6 +45,7 @@ const Index = () => {
         <Button 
           variant="ghost" 
           size="icon" 
+          onClick={() => navigate('/settings')}
           className="text-muted-foreground hover:text-foreground"
         >
           <Settings className="w-4 h-4" />
