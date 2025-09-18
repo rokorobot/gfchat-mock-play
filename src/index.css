@@ -8,35 +8,52 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
+    /* Beautiful gradient backgrounds */
+    --gradient-primary: linear-gradient(135deg, hsl(320 65% 80%), hsl(280 65% 80%));
+    --gradient-secondary: linear-gradient(135deg, hsl(340 50% 90%), hsl(320 50% 95%));
+    --gradient-chat: linear-gradient(180deg, hsl(330 30% 98%), hsl(320 20% 96%));
+    
+    /* Chat-specific colors */
+    --background: 330 30% 98%;
+    --foreground: 330 15% 15%;
 
     --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
+    --card-foreground: 330 15% 15%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
+    --popover-foreground: 330 15% 15%;
 
-    --primary: 222.2 47.4% 11.2%;
-    --primary-foreground: 210 40% 98%;
+    /* Beautiful primary - warm pink */
+    --primary: 320 65% 60%;
+    --primary-foreground: 0 0% 100%;
+    --primary-glow: 320 65% 75%;
 
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
+    /* Soft secondary */
+    --secondary: 330 20% 96%;
+    --secondary-foreground: 330 15% 25%;
 
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
+    /* Muted tones */
+    --muted: 330 15% 94%;
+    --muted-foreground: 330 10% 45%;
 
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
+    /* Accent for highlights */
+    --accent: 280 65% 70%;
+    --accent-foreground: 0 0% 100%;
+
+    /* Message bubbles */
+    --message-user: 320 65% 60%;
+    --message-user-foreground: 0 0% 100%;
+    --message-ai: 0 0% 100%;
+    --message-ai-foreground: 330 15% 15%;
 
     --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive-foreground: 0 0% 100%;
 
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
+    --border: 330 15% 90%;
+    --input: 330 15% 95%;
+    --ring: 320 65% 60%;
 
-    --radius: 0.5rem;
+    --radius: 1rem;
 
     --sidebar-background: 0 0% 98%;
 
