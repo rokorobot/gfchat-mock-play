@@ -4,6 +4,7 @@ import { ChatInput } from './ChatInput';
 import { TypingIndicator } from './TypingIndicator';
 import { useAuth } from '@/context/AuthContext';
 import { Heart } from 'lucide-react';
+import gfAvatar from '@/assets/gf-avatar.png';
 
 interface Message {
   id: string;
@@ -78,19 +79,25 @@ export const ChatInterface: React.FC = () => {
 
   return (
     <div className="flex flex-col h-screen bg-gradient-chat">
-      {/* Header */}
-      <div className="flex items-center gap-3 p-4 border-b border-border bg-card/80 backdrop-blur-sm">
-        <div className="w-10 h-10 rounded-full bg-gradient-primary flex items-center justify-center text-white font-medium">
-          AI
+      {/* Header with large GF Avatar */}
+      <div className="flex flex-col items-center p-6 border-b border-border bg-card/80 backdrop-blur-sm">
+        <div className="relative w-32 h-32 rounded-full overflow-hidden shadow-lg mb-4 bg-gradient-to-br from-primary to-accent p-1">
+          <div className="w-full h-full rounded-full overflow-hidden bg-white">
+            <img 
+              src={gfAvatar} 
+              alt="Your AI Girlfriend" 
+              className="w-full h-full object-cover"
+            />
+          </div>
         </div>
-        <div className="flex-1">
-          <h2 className="font-semibold text-card-foreground">Your AI Companion</h2>
-          <p className="text-sm text-muted-foreground flex items-center gap-1">
-            <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+        <div className="text-center">
+          <h2 className="text-xl font-semibold text-card-foreground mb-1">Your AI Girlfriend</h2>
+          <p className="text-sm text-muted-foreground flex items-center justify-center gap-2">
+            <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
             Online and ready to chat
+            <Heart className="w-4 h-4 text-primary fill-primary/20" />
           </p>
         </div>
-        <Heart className="w-5 h-5 text-primary fill-primary/20" />
       </div>
 
       {/* Messages */}
