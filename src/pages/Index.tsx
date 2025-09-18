@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { ChatInterface } from '@/components/chat/ChatInterface';
 import { useAuth } from '@/context/AuthContext';
 import { Button } from '@/components/ui/button';
-import { Heart, LogOut } from 'lucide-react';
+import { Heart, LogOut, Settings } from 'lucide-react';
 
 const Index = () => {
   const navigate = useNavigate();
@@ -41,6 +41,15 @@ const Index = () => {
 
   return (
     <div className="relative">
+      <div className="absolute top-4 left-4 z-10">
+        <Button 
+          variant="ghost" 
+          size="sm" 
+          className="text-muted-foreground hover:text-foreground"
+        >
+          <Settings className="w-4 h-4" />
+        </Button>
+      </div>
       <div className="absolute top-4 right-4 z-10">
         <Button 
           variant="ghost" 
