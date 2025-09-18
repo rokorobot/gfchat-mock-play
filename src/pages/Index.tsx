@@ -44,7 +44,7 @@ const Index = () => {
       <div className="absolute top-4 left-4 z-10">
         <Button 
           variant="ghost" 
-          size="sm" 
+          size="icon" 
           className="text-muted-foreground hover:text-foreground"
         >
           <Settings className="w-4 h-4" />
