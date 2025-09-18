@@ -3,7 +3,9 @@ import { MessageBubble } from './MessageBubble';
 import { ChatInput } from './ChatInput';
 import { TypingIndicator } from './TypingIndicator';
 import { useAuth } from '@/context/AuthContext';
+import { useToast } from '@/components/ui/use-toast';
 import { Heart } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
 import gfAvatar from '@/assets/gf-avatar.png';
 
 interface Message {
@@ -13,22 +15,12 @@ interface Message {
   timestamp: Date;
 }
 
-const AI_RESPONSES = [
-  "Hey there! I'm so happy to chat with you 💕",
-  "That's really interesting! Tell me more about what you're thinking.",
-  "I love spending time talking with you like this 😊",
-  "You always know how to make me smile! What's on your mind?",
-  "I'm here for you, always. How was your day?",
-  "That sounds wonderful! I wish I could be there with you.",
-  "You're such a thoughtful person. I really appreciate you.",
-  "I've been thinking about our conversations a lot lately 💭",
-];
-
 export const ChatInterface: React.FC = () => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [isTyping, setIsTyping] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const { user } = useAuth();
+  const { toast } = useToast();
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -44,7 +36,7 @@ export const ChatInterface: React.FC = () => {
       setTimeout(() => {
         const welcomeMessage: Message = {
           id: 'welcome',
-          content: "Hi! I'm your AI companion. I'm so excited to chat with you! 💕",
+          content: "Hi! I'm your AI girlfriend and I'm so excited to chat with you! 💕 How are you doing today?",
           isUser: false,
           timestamp: new Date(),
         };
@@ -64,17 +56,46 @@ export const ChatInterface: React.FC = () => {
     setMessages((prev) => [...prev, userMessage]);
     setIsTyping(true);
 
-    // Simulate AI response delay
-    setTimeout(() => {
-      setIsTyping(false);
+    try {
+      const { data, error } = await supabase.functions.invoke('chat-ai', {
+        body: { message: content },
+      });
+
+      if (error) {
+        console.error('Supabase function error:', error);
+        throw error;
+      }
+
+      if (data?.error) {
+        throw new Error(data.error);
+      }
+
       const aiResponse: Message = {
         id: (Date.now() + 1).toString(),
-        content: AI_RESPONSES[Math.floor(Math.random() * AI_RESPONSES.length)],
+        content: data.message || "I'm having trouble responding right now. Please try again! 💕",
         isUser: false,
         timestamp: new Date(),
       };
+
       setMessages((prev) => [...prev, aiResponse]);
-    }, 1500 + Math.random() * 1000);
+    } catch (error) {
+      console.error('Error getting AI response:', error);
+      toast({
+        title: "Connection Error",
+        description: "I'm having trouble connecting right now. Please try again!",
+        variant: "destructive",
+      });
+      
+      const errorResponse: Message = {
+        id: (Date.now() + 1).toString(),
+        content: "Sorry, I'm having trouble connecting right now. Please try again in a moment! 💕",
+        isUser: false,
+        timestamp: new Date(),
+      };
+      setMessages((prev) => [...prev, errorResponse]);
+    } finally {
+      setIsTyping(false);
+    }
   };
 
   return (
