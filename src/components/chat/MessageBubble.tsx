@@ -1,5 +1,6 @@
 import React from 'react';
 import { cn } from '@/lib/utils';
+import gfAvatar from '@/assets/gf-avatar.png';
 
 interface MessageBubbleProps {
   message: string;
@@ -20,8 +21,12 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({
       isUser ? "justify-end" : "justify-start"
     )}>
       {!isUser && (
-        <div className="w-8 h-8 rounded-full bg-gradient-primary flex items-center justify-center text-white font-medium text-sm">
-          {avatar || "AI"}
+        <div className="w-8 h-8 rounded-full overflow-hidden border-2 border-gradient-primary">
+          <img 
+            src={avatar || gfAvatar} 
+            alt="GF Avatar" 
+            className="w-full h-full object-cover"
+          />
         </div>
       )}
       
