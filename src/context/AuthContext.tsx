@@ -1,16 +1,11 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-
-interface User {
-  id: string;
-  name: string;
-  avatar?: string;
-}
+import { supabase } from '@/integrations/supabase/client';
+import { User, Session } from '@supabase/supabase-js';
 
 interface AuthContextType {
   user: User | null;
-  token: string | null;
+  session: Session | null;
   isAuthenticated: boolean;
-  login: (email: string, password: string) => Promise<void>;
   logout: () => void;
 }
 
@@ -23,46 +18,50 @@ interface AuthProviderProps {
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children, preview = false }) => {
   const [user, setUser] = useState<User | null>(null);
-  const [token, setToken] = useState<string | null>(null);
+  const [session, setSession] = useState<Session | null>(null);
 
   useEffect(() => {
     if (preview) {
-      // Mock user and token for preview mode
+      // Mock user for preview mode
       setUser({
         id: 'preview-user',
-        name: 'Preview User',
-        avatar: '👤'
-      });
-      setToken('preview-token-123');
-    }
-  }, [preview]);
-
-  const login = async (email: string, password: string) => {
-    // Mock login for preview mode
-    if (preview) {
-      setUser({
-        id: 'demo-user',
-        name: 'Demo User',
-        avatar: '👤'
-      });
-      setToken('demo-token-456');
+        email: 'preview@example.com',
+        user_metadata: { name: 'Preview User' },
+        app_metadata: {},
+        aud: 'authenticated',
+        created_at: '2024-01-01T00:00:00Z',
+        updated_at: '2024-01-01T00:00:00Z'
+      } as User);
       return;
     }
-    
-    // TODO: Implement real authentication
-    throw new Error('Authentication not implemented yet');
-  };
 
-  const logout = () => {
+    // Set up auth state listener FIRST
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (event, session) => {
+        setSession(session);
+        setUser(session?.user ?? null);
+      }
+    );
+
+    // THEN check for existing session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+      setUser(session?.user ?? null);
+    });
+
+    return () => subscription.unsubscribe();
+  }, [preview]);
+
+  const logout = async () => {
+    await supabase.auth.signOut();
     setUser(null);
-    setToken(null);
+    setSession(null);
   };
 
   const value = {
     user,
-    token,
-    isAuthenticated: !!user && !!token,
-    login,
+    session,
+    isAuthenticated: !!user && !!session,
     logout,
   };
 

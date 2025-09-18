@@ -101,7 +101,7 @@ export const ChatInterface: React.FC = () => {
             message={message.content}
             isUser={message.isUser}
             timestamp={message.timestamp}
-            avatar={message.isUser ? user?.avatar : "💕"}
+            avatar={message.isUser ? "👤" : "💕"}
           />
         ))}
         <TypingIndicator isVisible={isTyping} />

@@ -7,8 +7,7 @@ import "./index.css";
 // main.tsx entry point with preview mode enabled
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
-    {/* Preview mode ensures profile + token are mocked so you can see the app without backend */}
-    <AuthProvider preview>
+    <AuthProvider>
       <App />
     </AuthProvider>
   </React.StrictMode>
