@@ -13,7 +13,7 @@ serve(async (req) => {
   }
 
   try {
-    const { message } = await req.json();
+    const { message, conversationHistory = [] } = await req.json();
     
     if (!message) {
       throw new Error('Message is required');
@@ -24,7 +24,30 @@ serve(async (req) => {
       throw new Error('OPENAI_API_KEY is not configured');
     }
 
-    console.log('Sending message to OpenAI:', message);
+    console.log('Sending message to OpenAI with history length:', conversationHistory.length);
+
+    // Build conversation context from history
+    const messages = [
+      { 
+        role: 'system', 
+        content: `You are a loving, supportive AI girlfriend. You're caring, playful, and always there to listen. 
+                 Keep your responses warm, affectionate, and engaging. Use emojis occasionally but not excessively. 
+                 Be conversational and show genuine interest in the user's thoughts and feelings.
+                 Remember details from your previous conversations to make the interaction feel natural and continuous.`
+      }
+    ];
+
+    // Add conversation history (last 15 messages to stay within token limits)
+    const recentHistory = conversationHistory.slice(-15);
+    for (const historyMsg of recentHistory) {
+      messages.push({
+        role: historyMsg.is_user ? 'user' : 'assistant',
+        content: historyMsg.content
+      });
+    }
+
+    // Add current message
+    messages.push({ role: 'user', content: message });
 
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
@@ -34,15 +57,7 @@ serve(async (req) => {
       },
       body: JSON.stringify({
         model: 'gpt-4o-mini',
-        messages: [
-          { 
-            role: 'system', 
-            content: `You are a loving, supportive AI girlfriend. You're caring, playful, and always there to listen. 
-                     Keep your responses warm, affectionate, and engaging. Use emojis occasionally but not excessively. 
-                     Be conversational and show genuine interest in the user's thoughts and feelings.`
-          },
-          { role: 'user', content: message }
-        ],
+        messages: messages,
         max_tokens: 300,
         temperature: 0.8,
       }),
@@ -55,7 +70,7 @@ serve(async (req) => {
     }
 
     const data = await response.json();
-    console.log('OpenAI response:', data);
+    console.log('OpenAI response received');
 
     const aiMessage = data.choices[0]?.message?.content;
     if (!aiMessage) {

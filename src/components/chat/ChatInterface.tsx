@@ -4,7 +4,8 @@ import { ChatInput } from './ChatInput';
 import { TypingIndicator } from './TypingIndicator';
 import { useAuth } from '@/context/AuthContext';
 import { useToast } from '@/components/ui/use-toast';
-import { Heart } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Heart, Trash2 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import gfAvatar from '@/assets/gf-avatar.png';
 
@@ -18,6 +19,7 @@ interface Message {
 export const ChatInterface: React.FC = () => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [isTyping, setIsTyping] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const { user } = useAuth();
   const { toast } = useToast();
@@ -30,22 +32,126 @@ export const ChatInterface: React.FC = () => {
     scrollToBottom();
   }, [messages, isTyping]);
 
+  // Load existing messages on mount
   useEffect(() => {
-    // Send initial welcome message
-    if (messages.length === 0) {
-      setTimeout(() => {
-        const welcomeMessage: Message = {
-          id: 'welcome',
-          content: "Hi! I'm your AI girlfriend and I'm so excited to chat with you! 💕 How are you doing today?",
-          isUser: false,
-          timestamp: new Date(),
-        };
-        setMessages([welcomeMessage]);
+    const loadMessages = async () => {
+      if (!user) return;
+
+      try {
+        const { data: existingMessages, error } = await supabase
+          .from('messages')
+          .select('*')
+          .eq('user_id', user.id)
+          .order('created_at', { ascending: true });
+
+        if (error) {
+          console.error('Error loading messages:', error);
+          return;
+        }
+
+        if (existingMessages && existingMessages.length > 0) {
+          const formattedMessages: Message[] = existingMessages.map(msg => ({
+            id: msg.id,
+            content: msg.content,
+            isUser: msg.is_user,
+            timestamp: new Date(msg.created_at),
+          }));
+          setMessages(formattedMessages);
+        } else {
+          // Send initial welcome message if no messages exist
+          setTimeout(async () => {
+            const welcomeMessage = "Hi! I'm your AI girlfriend and I'm so excited to chat with you! 💕 How are you doing today?";
+            
+            const { error: insertError } = await supabase
+              .from('messages')
+              .insert({
+                user_id: user.id,
+                content: welcomeMessage,
+                is_user: false,
+              });
+
+            if (!insertError) {
+              const message: Message = {
+                id: 'welcome',
+                content: welcomeMessage,
+                isUser: false,
+                timestamp: new Date(),
+              };
+              setMessages([message]);
+            }
+          }, 1000);
+        }
+      } catch (error) {
+        console.error('Error loading messages:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadMessages();
+  }, [user]);
+
+  const clearChatHistory = async () => {
+    if (!user) return;
+
+    try {
+      const { error } = await supabase
+        .from('messages')
+        .delete()
+        .eq('user_id', user.id);
+
+      if (error) {
+        console.error('Error clearing chat history:', error);
+        toast({
+          title: "Error",
+          description: "Failed to clear chat history. Please try again.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      setMessages([]);
+      toast({
+        title: "Chat Cleared",
+        description: "Your conversation history has been cleared! 💕",
+      });
+
+      // Send a new welcome message
+      setTimeout(async () => {
+        const welcomeMessage = "Hi again! I'm ready for a fresh start. What would you like to talk about? 💕";
+        
+        const { error: insertError } = await supabase
+          .from('messages')
+          .insert({
+            user_id: user.id,
+            content: welcomeMessage,
+            is_user: false,
+          });
+
+        if (!insertError) {
+          const message: Message = {
+            id: 'new-welcome',
+            content: welcomeMessage,
+            isUser: false,
+            timestamp: new Date(),
+          };
+          setMessages([message]);
+        }
       }, 1000);
+
+    } catch (error) {
+      console.error('Error clearing chat history:', error);
+      toast({
+        title: "Error",
+        description: "Failed to clear chat history. Please try again.",
+        variant: "destructive",
+      });
     }
-  }, [messages.length]);
+  };
 
   const handleSendMessage = async (content: string) => {
+    if (!user) return;
+
     const userMessage: Message = {
       id: Date.now().toString(),
       content,
@@ -57,8 +163,32 @@ export const ChatInterface: React.FC = () => {
     setIsTyping(true);
 
     try {
+      // Save user message to database
+      const { error: userMsgError } = await supabase
+        .from('messages')
+        .insert({
+          user_id: user.id,
+          content: content,
+          is_user: true,
+        });
+
+      if (userMsgError) {
+        console.error('Error saving user message:', userMsgError);
+      }
+
+      // Get conversation history for AI context
+      const { data: conversationHistory } = await supabase
+        .from('messages')
+        .select('content, is_user, created_at')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: true })
+        .limit(20); // Get last 20 messages for context
+
       const { data, error } = await supabase.functions.invoke('chat-ai', {
-        body: { message: content },
+        body: { 
+          message: content,
+          conversationHistory: conversationHistory || []
+        },
       });
 
       if (error) {
@@ -78,6 +208,20 @@ export const ChatInterface: React.FC = () => {
       };
 
       setMessages((prev) => [...prev, aiResponse]);
+
+      // Save AI response to database
+      const { error: aiMsgError } = await supabase
+        .from('messages')
+        .insert({
+          user_id: user.id,
+          content: aiResponse.content,
+          is_user: false,
+        });
+
+      if (aiMsgError) {
+        console.error('Error saving AI message:', aiMsgError);
+      }
+
     } catch (error) {
       console.error('Error getting AI response:', error);
       toast({
@@ -118,29 +262,46 @@ export const ChatInterface: React.FC = () => {
             Online and ready to chat
             <Heart className="w-4 h-4 text-primary fill-primary/20" />
           </p>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={clearChatHistory}
+            className="mt-2 text-xs text-muted-foreground hover:text-foreground"
+          >
+            <Trash2 className="w-3 h-3 mr-1" />
+            Clear Chat
+          </Button>
         </div>
       </div>
 
       {/* Messages */}
       <div className="flex-1 overflow-y-auto p-4 space-y-1">
-        {messages.map((message) => (
-          <MessageBubble
-            key={message.id}
-            message={message.content}
-            isUser={message.isUser}
-            timestamp={message.timestamp}
-            avatar={message.isUser ? "👤" : "💕"}
-          />
-        ))}
-        <TypingIndicator isVisible={isTyping} />
-        <div ref={messagesEndRef} />
+        {isLoading ? (
+          <div className="flex items-center justify-center h-32">
+            <div className="text-muted-foreground">Loading your conversation...</div>
+          </div>
+        ) : (
+          <>
+            {messages.map((message) => (
+              <MessageBubble
+                key={message.id}
+                message={message.content}
+                isUser={message.isUser}
+                timestamp={message.timestamp}
+                avatar={message.isUser ? "👤" : "💕"}
+              />
+            ))}
+            <TypingIndicator isVisible={isTyping} />
+            <div ref={messagesEndRef} />
+          </>
+        )}
       </div>
 
       {/* Input */}
       <ChatInput
         onSendMessage={handleSendMessage}
         placeholder="Share your thoughts..."
-        disabled={isTyping}
+        disabled={isTyping || isLoading}
       />
     </div>
   );
