@@ -4,8 +4,7 @@ import { ChatInput } from './ChatInput';
 import { TypingIndicator } from './TypingIndicator';
 import { useAuth } from '@/context/AuthContext';
 import { useToast } from '@/components/ui/use-toast';
-import { Button } from '@/components/ui/button';
-import { Heart, Trash2 } from 'lucide-react';
+import { Heart } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import gfAvatar from '@/assets/gf-avatar.png';
 
@@ -90,64 +89,6 @@ export const ChatInterface: React.FC = () => {
 
     loadMessages();
   }, [user]);
-
-  const clearChatHistory = async () => {
-    if (!user) return;
-
-    try {
-      const { error } = await supabase
-        .from('messages')
-        .delete()
-        .eq('user_id', user.id);
-
-      if (error) {
-        console.error('Error clearing chat history:', error);
-        toast({
-          title: "Error",
-          description: "Failed to clear chat history. Please try again.",
-          variant: "destructive",
-        });
-        return;
-      }
-
-      setMessages([]);
-      toast({
-        title: "Chat Cleared",
-        description: "Your conversation history has been cleared! 💕",
-      });
-
-      // Send a new welcome message
-      setTimeout(async () => {
-        const welcomeMessage = "Hi again! I'm ready for a fresh start. What would you like to talk about? 💕";
-        
-        const { error: insertError } = await supabase
-          .from('messages')
-          .insert({
-            user_id: user.id,
-            content: welcomeMessage,
-            is_user: false,
-          });
-
-        if (!insertError) {
-          const message: Message = {
-            id: 'new-welcome',
-            content: welcomeMessage,
-            isUser: false,
-            timestamp: new Date(),
-          };
-          setMessages([message]);
-        }
-      }, 1000);
-
-    } catch (error) {
-      console.error('Error clearing chat history:', error);
-      toast({
-        title: "Error",
-        description: "Failed to clear chat history. Please try again.",
-        variant: "destructive",
-      });
-    }
-  };
 
   const handleSendMessage = async (content: string) => {
     if (!user) return;
@@ -262,15 +203,6 @@ export const ChatInterface: React.FC = () => {
             Online and ready to chat
             <Heart className="w-4 h-4 text-primary fill-primary/20" />
           </p>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={clearChatHistory}
-            className="mt-2 text-xs text-muted-foreground hover:text-foreground"
-          >
-            <Trash2 className="w-3 h-3 mr-1" />
-            Clear Chat
-          </Button>
         </div>
       </div>
 
