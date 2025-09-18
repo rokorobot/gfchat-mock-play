@@ -17,7 +17,7 @@ const Index = () => {
 
   const handleLogout = async () => {
     await logout();
-    navigate('/auth');
+    navigate('/');
   };
 
   if (!isAuthenticated) {

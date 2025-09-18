@@ -37,7 +37,7 @@ export const Auth: React.FC = () => {
           title: "Welcome back!",
           description: "You've been signed in successfully.",
         });
-        navigate('/');
+        navigate('/chat');
       }
     } catch (error) {
       toast({
@@ -55,7 +55,7 @@ export const Auth: React.FC = () => {
     setLoading(true);
 
     try {
-      const redirectUrl = `${window.location.origin}/`;
+      const redirectUrl = `${window.location.origin}/chat`;
       
       const { error } = await supabase.auth.signUp({
         email,
