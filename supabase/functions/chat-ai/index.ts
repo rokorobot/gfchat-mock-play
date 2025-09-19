@@ -27,12 +27,16 @@ serve(async (req) => {
     console.log('Sending message to OpenAI with history length:', conversationHistory.length);
 
     // Build conversation context from history
-    const defaultPersonality = `You are a loving, supportive AI girlfriend. You're caring, playful, and always there to listen. 
-                 Keep your responses warm, affectionate, and engaging. Use emojis occasionally but not excessively. 
-                 Be conversational and show genuine interest in the user's thoughts and feelings.
-                 Remember details from your previous conversations to make the interaction feel natural and continuous.`;
+    const defaultPersonality = "loving, supportive AI girlfriend who is caring, playful, and always there to listen";
+    const personality = personalityPrompt || defaultPersonality;
     
-    const systemPrompt = personalityPrompt || defaultPersonality;
+    const systemPrompt = `You are GF.Chat, a supportive AI companion. Stay in character, keep responses concise but warm, and adapt to the chosen personality style:
+
+- Personality: ${personality}
+- User name: {NAME}
+
+Avoid explicit or unsafe content. Keep tone consistent with the selected personality. Use light emojis only when appropriate.
+Remember details from your previous conversations to make the interaction feel natural and continuous.`;
     
     const messages = [
       { 
