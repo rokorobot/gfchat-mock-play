@@ -9,12 +9,33 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Slider } from '@/components/ui/slider';
+import { useSettings } from '@/hooks/useSettings';
+import { useToast } from '@/components/ui/use-toast';
 
 const Settings = () => {
   const navigate = useNavigate();
-  const [personality, setPersonality] = useState('');
-  const [voiceMode, setVoiceMode] = useState(true);
-  const [voiceVolume, setVoiceVolume] = useState([80]);
+  const { settings, updateSettings, saveSettings } = useSettings();
+  const { toast } = useToast();
+  const [isSaving, setIsSaving] = useState(false);
+
+  const handleSave = async () => {
+    setIsSaving(true);
+    try {
+      await saveSettings();
+      toast({
+        title: "Settings Saved",
+        description: "Your settings have been saved successfully!",
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to save settings. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSaving(false);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gradient-chat p-4">
@@ -58,8 +79,8 @@ const Settings = () => {
                   <Textarea
                     id="personality"
                     placeholder="E.g., Be caring, playful, and supportive. Show interest in my hobbies and always be encouraging..."
-                    value={personality}
-                    onChange={(e) => setPersonality(e.target.value)}
+                    value={settings.personality}
+                    onChange={(e) => updateSettings({ personality: e.target.value })}
                     className="min-h-[100px]"
                   />
                 </div>
@@ -78,7 +99,7 @@ const Settings = () => {
                     <Label htmlFor="avatar-style" className="text-sm text-muted-foreground">
                       Avatar Style
                     </Label>
-                    <Select>
+                    <Select value={settings.avatarStyle} onValueChange={(value) => updateSettings({ avatarStyle: value })}>
                       <SelectTrigger>
                         <SelectValue placeholder="Choose avatar style" />
                       </SelectTrigger>
@@ -94,7 +115,7 @@ const Settings = () => {
                     <Label htmlFor="theme" className="text-sm text-muted-foreground">
                       Chat Theme
                     </Label>
-                    <Select>
+                    <Select value={settings.chatTheme} onValueChange={(value) => updateSettings({ chatTheme: value })}>
                       <SelectTrigger>
                         <SelectValue placeholder="Select theme" />
                       </SelectTrigger>
@@ -126,8 +147,8 @@ const Settings = () => {
                     </div>
                   </div>
                   <Switch
-                    checked={voiceMode}
-                    onCheckedChange={setVoiceMode}
+                    checked={settings.voiceMode}
+                    onCheckedChange={(checked) => updateSettings({ voiceMode: checked })}
                   />
                 </div>
               </div>
@@ -145,26 +166,28 @@ const Settings = () => {
                     <Label htmlFor="voice-type" className="text-sm text-muted-foreground">
                       Voice Type
                     </Label>
-                    <Select>
+                    <Select value={settings.voiceType} onValueChange={(value) => updateSettings({ voiceType: value })}>
                       <SelectTrigger>
                         <SelectValue placeholder="Choose voice" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="aria">Aria - Sweet & Gentle</SelectItem>
-                        <SelectItem value="sarah">Sarah - Confident & Warm</SelectItem>
-                        <SelectItem value="charlotte">Charlotte - Playful & Energetic</SelectItem>
-                        <SelectItem value="jessica">Jessica - Calm & Soothing</SelectItem>
+                        <SelectItem value="alloy">Alloy - Neutral & Clear</SelectItem>
+                        <SelectItem value="echo">Echo - Deep & Resonant</SelectItem>
+                        <SelectItem value="fable">Fable - Warm & Expressive</SelectItem>
+                        <SelectItem value="onyx">Onyx - Rich & Smooth</SelectItem>
+                        <SelectItem value="nova">Nova - Bright & Energetic</SelectItem>
+                        <SelectItem value="shimmer">Shimmer - Light & Airy</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
                   <div className="space-y-2">
                     <Label className="text-sm text-muted-foreground flex items-center justify-between">
                       Voice Volume
-                      <span className="text-xs">{voiceVolume[0]}%</span>
+                      <span className="text-xs">{settings.voiceVolume}%</span>
                     </Label>
                     <Slider
-                      value={voiceVolume}
-                      onValueChange={setVoiceVolume}
+                      value={[settings.voiceVolume]}
+                      onValueChange={(value) => updateSettings({ voiceVolume: value[0] })}
                       max={100}
                       min={0}
                       step={5}
@@ -184,8 +207,12 @@ const Settings = () => {
 
           {/* Save Button */}
           <div className="flex justify-end">
-            <Button className="min-w-[120px]">
-              Save Changes
+            <Button 
+              className="min-w-[120px]" 
+              onClick={handleSave}
+              disabled={isSaving}
+            >
+              {isSaving ? 'Saving...' : 'Save Changes'}
             </Button>
           </div>
         </div>
