@@ -3,7 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
-import { ArrowLeft, Bot, Palette, Volume2 } from 'lucide-react';
+import { Switch } from '@/components/ui/switch';
+import { ArrowLeft, Bot, Palette, Volume2, Mic } from 'lucide-react';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -12,6 +13,7 @@ import { Slider } from '@/components/ui/slider';
 const Settings = () => {
   const navigate = useNavigate();
   const [personality, setPersonality] = useState('');
+  const [voiceMode, setVoiceMode] = useState(true);
   const [voiceVolume, setVoiceVolume] = useState([80]);
 
   return (
@@ -109,10 +111,33 @@ const Settings = () => {
 
               <Separator />
 
-              {/* Voice Section */}
+              {/* Voice Mode Section */}
               <div className="space-y-3">
                 <Label className="text-base font-medium flex items-center gap-2">
                   <span className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center text-xs font-bold">3</span>
+                  Voice Mode
+                </Label>
+                <div className="flex items-center justify-between p-4 border rounded-lg">
+                  <div className="flex items-center gap-3">
+                    <Mic className="w-5 h-5 text-primary" />
+                    <div>
+                      <Label className="text-sm font-medium">Enable Voice Responses</Label>
+                      <p className="text-xs text-muted-foreground">AI will speak her responses aloud</p>
+                    </div>
+                  </div>
+                  <Switch
+                    checked={voiceMode}
+                    onCheckedChange={setVoiceMode}
+                  />
+                </div>
+              </div>
+
+              <Separator />
+
+              {/* Voice Section */}
+              <div className="space-y-3">
+                <Label className="text-base font-medium flex items-center gap-2">
+                  <span className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center text-xs font-bold">4</span>
                   Voice Settings
                 </Label>
                 <div className="space-y-4">
