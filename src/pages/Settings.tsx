@@ -302,10 +302,7 @@ const Settings = () => {
                 <div className="flex items-center justify-between p-4 border rounded-lg">
                   <div className="flex items-center gap-3">
                     <Mic className="w-5 h-5 text-primary" />
-                    <div>
-                      <Label className="text-sm font-medium">Enable Voice Responses</Label>
-                      <p className="text-xs text-muted-foreground">AI will speak her responses aloud</p>
-                    </div>
+                    <Label className="text-sm font-medium">Enable Voice Responses</Label>
                   </div>
                   <Switch
                     checked={settings.voiceMode}
