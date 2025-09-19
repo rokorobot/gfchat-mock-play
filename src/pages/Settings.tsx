@@ -243,15 +243,6 @@ const Settings = () => {
                         </div>
                       </div>
                     )}
-
-                    {/* Max Limit Message */}
-                    {settings.savedPersonalities.length >= 5 && (
-                      <div className="p-3 bg-muted/50 rounded-lg">
-                        <p className="text-sm text-muted-foreground">
-                          You've reached the maximum of 5 personalities. Delete one to create a new one.
-                        </p>
-                      </div>
-                    )}
                   </div>
                 )}
               </div>
