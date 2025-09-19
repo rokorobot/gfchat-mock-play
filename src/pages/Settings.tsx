@@ -108,22 +108,21 @@ const Settings = () => {
                     {/* Quick Personality Selection */}
                     <div className="space-y-3">
                       <Label className="text-sm text-muted-foreground">Quick Select Personality</Label>
-                      <div className="grid grid-cols-2 gap-2">
-                        {Object.entries(getPersonalityPrompts()).map(([name, description]) => (
-                          <Button
-                            key={name}
-                            variant="outline"
-                            size="sm"
-                            onClick={() => selectPresetPersonality(name as keyof ReturnType<typeof getPersonalityPrompts>)}
-                            className="h-auto p-3 text-left justify-start"
-                          >
-                            <div>
-                              <div className="font-medium text-xs">{name}</div>
-                              <div className="text-xs text-muted-foreground truncate">{String(description).slice(0, 40)}...</div>
-                            </div>
-                          </Button>
-                        ))}
-                      </div>
+                      <Select onValueChange={(value) => selectPresetPersonality(value as keyof ReturnType<typeof getPersonalityPrompts>)}>
+                        <SelectTrigger className="w-full bg-background border-border">
+                          <SelectValue placeholder="Choose a preset personality..." />
+                        </SelectTrigger>
+                        <SelectContent className="bg-background border-border shadow-lg z-50">
+                          {Object.entries(getPersonalityPrompts()).map(([name, description]) => (
+                            <SelectItem key={name} value={name} className="hover:bg-accent">
+                              <div>
+                                <div className="font-medium">{name}</div>
+                                <div className="text-xs text-muted-foreground">{String(description)}</div>
+                              </div>
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
                     </div>
 
                     {/* Saved Personalities Dropdown */}
