@@ -203,12 +203,6 @@ const Settings = () => {
                       className="w-full"
                     />
                   </div>
-                  <div className="flex items-center gap-2 p-3 bg-muted/50 rounded-lg">
-                    <Volume2 className="w-4 h-4 text-muted-foreground" />
-                    <span className="text-sm text-muted-foreground">
-                      Voice messages will be enabled when you configure this feature
-                    </span>
-                  </div>
                 </div>
               </div>
             </CardContent>
