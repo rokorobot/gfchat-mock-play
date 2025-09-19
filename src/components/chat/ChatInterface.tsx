@@ -4,6 +4,7 @@ import { ChatInput } from './ChatInput';
 import { TypingIndicator } from './TypingIndicator';
 import { useAuth } from '@/context/AuthContext';
 import { useToast } from '@/components/ui/use-toast';
+import { useTextToSpeech } from '@/hooks/useTextToSpeech';
 import { Heart } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import gfAvatar from '@/assets/gf-avatar.png';
@@ -19,9 +20,11 @@ export const ChatInterface: React.FC = () => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [isTyping, setIsTyping] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [lastAiMessageId, setLastAiMessageId] = useState<string>('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const { user } = useAuth();
   const { toast } = useToast();
+  const { speak, isLoading: isSpeaking } = useTextToSpeech();
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -30,6 +33,17 @@ export const ChatInterface: React.FC = () => {
   useEffect(() => {
     scrollToBottom();
   }, [messages, isTyping]);
+
+  // Auto-speak new AI responses
+  useEffect(() => {
+    if (isLoading) return; // Don't speak during initial load
+    
+    const lastMessage = messages[messages.length - 1];
+    if (lastMessage && !lastMessage.isUser && lastMessage.id !== lastAiMessageId) {
+      setLastAiMessageId(lastMessage.id);
+      speak(lastMessage.content);
+    }
+  }, [messages, isLoading, lastAiMessageId, speak]);
 
   // Load existing messages on mount
   useEffect(() => {
