@@ -183,9 +183,7 @@ const Settings = () => {
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="alloy">Alloy - Neutral & Clear</SelectItem>
-                        <SelectItem value="echo">Echo - Deep & Resonant</SelectItem>
                         <SelectItem value="fable">Fable - Warm & Expressive</SelectItem>
-                        <SelectItem value="onyx">Onyx - Rich & Smooth</SelectItem>
                         <SelectItem value="nova">Nova - Bright & Energetic</SelectItem>
                         <SelectItem value="shimmer">Shimmer - Light & Airy</SelectItem>
                       </SelectContent>
