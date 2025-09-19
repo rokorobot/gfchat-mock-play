@@ -13,7 +13,7 @@ export interface AppSettings {
 const defaultSettings: AppSettings = {
   personality: '',
   voiceMode: true,
-  voiceType: 'alloy',
+  voiceType: 'nova',
   voiceVolume: 80,
   avatarStyle: 'realistic',
   chatTheme: 'romantic',
