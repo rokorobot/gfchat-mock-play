@@ -156,7 +156,8 @@ export const ChatInterface: React.FC = () => {
         body: { 
           message: content,
           conversationHistory: conversationHistory || [],
-          personalityPrompt: getCurrentPersonalityText()
+          personalityPrompt: getCurrentPersonalityText(),
+          user_id: user.id
         },
       });
 
