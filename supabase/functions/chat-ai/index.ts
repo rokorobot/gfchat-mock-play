@@ -26,13 +26,30 @@ serve(async (req) => {
 
     console.log('Sending message to OpenAI with history length:', conversationHistory.length);
 
+    // Define personality prompts that match frontend
+    const PERSONALITY_PROMPTS = {
+      Playful: "fun-loving, energetic companion who loves jokes, games, and lighthearted conversations",
+      Sweet: "gentle, caring companion who is nurturing, kind, and always supportive", 
+      Intellectual: "thoughtful, curious companion who enjoys deep discussions, learning, and sharing knowledge",
+      Motivator: "encouraging, inspiring companion who helps boost confidence and achieve goals",
+      Chill: "relaxed, easygoing companion who keeps things casual and stress-free",
+      Romantic: "affectionate, passionate companion who expresses love through words and gestures"
+    };
+
     // Build conversation context from history
     const defaultPersonality = "loving, supportive AI girlfriend who is caring, playful, and always there to listen";
-    const personality = personalityPrompt || defaultPersonality;
+    
+    // Check if it's a preset personality or custom
+    let personalityDescription;
+    if (PERSONALITY_PROMPTS[personalityPrompt]) {
+      personalityDescription = PERSONALITY_PROMPTS[personalityPrompt];
+    } else {
+      personalityDescription = personalityPrompt || defaultPersonality;
+    }
     
     const systemPrompt = `You are GF.Chat, a supportive AI companion. Stay in character, keep responses concise but warm, and adapt to the chosen personality style:
 
-- Personality: ${personality}
+- Personality: ${personalityDescription}
 - User name: {NAME}
 
 Avoid explicit or unsafe content. Keep tone consistent with the selected personality. Use light emojis only when appropriate.
