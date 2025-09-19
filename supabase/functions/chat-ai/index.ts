@@ -13,7 +13,7 @@ serve(async (req) => {
   }
 
   try {
-    const { message, conversationHistory = [] } = await req.json();
+    const { message, conversationHistory = [], personalityPrompt = '' } = await req.json();
     
     if (!message) {
       throw new Error('Message is required');
@@ -27,13 +27,17 @@ serve(async (req) => {
     console.log('Sending message to OpenAI with history length:', conversationHistory.length);
 
     // Build conversation context from history
+    const defaultPersonality = `You are a loving, supportive AI girlfriend. You're caring, playful, and always there to listen. 
+                 Keep your responses warm, affectionate, and engaging. Use emojis occasionally but not excessively. 
+                 Be conversational and show genuine interest in the user's thoughts and feelings.
+                 Remember details from your previous conversations to make the interaction feel natural and continuous.`;
+    
+    const systemPrompt = personalityPrompt || defaultPersonality;
+    
     const messages = [
       { 
         role: 'system', 
-        content: `You are a loving, supportive AI girlfriend. You're caring, playful, and always there to listen. 
-                 Keep your responses warm, affectionate, and engaging. Use emojis occasionally but not excessively. 
-                 Be conversational and show genuine interest in the user's thoughts and feelings.
-                 Remember details from your previous conversations to make the interaction feel natural and continuous.`
+        content: systemPrompt
       }
     ];
 

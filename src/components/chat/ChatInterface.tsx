@@ -26,7 +26,7 @@ export const ChatInterface: React.FC = () => {
   const { user } = useAuth();
   const { toast } = useToast();
   const { speak, isLoading: isSpeaking } = useTextToSpeech();
-  const { settings } = useSettings();
+  const { settings, getCurrentPersonalityText } = useSettings();
 
   // Add safety check for settings
   if (!settings) {
@@ -155,7 +155,8 @@ export const ChatInterface: React.FC = () => {
       const { data, error } = await supabase.functions.invoke('chat-ai', {
         body: { 
           message: content,
-          conversationHistory: conversationHistory || []
+          conversationHistory: conversationHistory || [],
+          personalityPrompt: getCurrentPersonalityText()
         },
       });
 
