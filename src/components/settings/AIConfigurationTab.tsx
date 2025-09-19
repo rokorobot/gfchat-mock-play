@@ -1,0 +1,205 @@
+import React, { useState } from 'react';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Separator } from '@/components/ui/separator';
+import { Switch } from '@/components/ui/switch';
+import { Bot, Plus, Trash2 } from 'lucide-react';
+import { Textarea } from '@/components/ui/textarea';
+import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Input } from '@/components/ui/input';
+import { useSettings } from '@/hooks/useSettings';
+import { useToast } from '@/components/ui/use-toast';
+
+export const AIConfigurationTab = () => {
+  const { settings, updateSettings, addPersonality, deletePersonality, getCurrentPersonalityText, getPersonalityPrompts, selectPresetPersonality } = useSettings();
+  const { toast } = useToast();
+  const [isCreatingPersonality, setIsCreatingPersonality] = useState(false);
+  const [newPersonalityName, setNewPersonalityName] = useState('');
+  const [newPersonalityDescription, setNewPersonalityDescription] = useState('');
+
+  if (!settings) {
+    return <div className="text-center">Loading...</div>;
+  }
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2">
+          <Bot className="w-5 h-5" />
+          AI Configuration
+        </CardTitle>
+        <CardDescription>
+          Customize your AI girlfriend's behavior and characteristics
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-6">
+        {/* Personality Section */}
+        <div className="space-y-3">
+          <Label className="text-base font-medium flex items-center gap-2">
+            <span className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center text-xs font-bold">1</span>
+            AI Personality
+          </Label>
+          
+          {/* Default AI Toggle */}
+          <div className="flex items-center justify-between p-4 border rounded-lg">
+            <div className="flex items-center gap-3">
+              <Bot className="w-5 h-5 text-primary" />
+              <Label className="text-sm font-medium">Use Default AI</Label>
+            </div>
+            <Switch
+              checked={settings.useDefaultAI}
+              onCheckedChange={(checked) => updateSettings({ useDefaultAI: checked })}
+            />
+          </div>
+
+          {!settings.useDefaultAI && (
+            <div className="space-y-4">
+              {/* Quick Personality Selection */}
+              <div className="space-y-3">
+                <Label className="text-sm text-muted-foreground">Quick Select Personality</Label>
+                <Select onValueChange={(value) => selectPresetPersonality(value as keyof ReturnType<typeof getPersonalityPrompts>)}>
+                  <SelectTrigger className="w-full bg-background border-border">
+                    <SelectValue placeholder="Choose a preset personality..." />
+                  </SelectTrigger>
+                  <SelectContent className="bg-background border-border shadow-lg z-50">
+                    {Object.entries(getPersonalityPrompts()).map(([name, description]) => (
+                      <SelectItem key={name} value={name} className="hover:bg-accent">
+                        <div>
+                          <div className="font-medium">{name}</div>
+                          <div className="text-xs text-muted-foreground">{String(description)}</div>
+                        </div>
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Saved Personalities Dropdown */}
+              {settings.savedPersonalities.length > 0 && (
+                <div className="space-y-2">
+                  <Label htmlFor="personality-select" className="text-sm text-muted-foreground">
+                    Select Customised Personality
+                  </Label>
+                  <Select 
+                    value={settings.currentPersonality} 
+                    onValueChange={(value) => updateSettings({ currentPersonality: value })}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Choose a personality" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {settings.savedPersonalities.map((personality) => (
+                        <SelectItem key={personality.id} value={personality.id}>
+                          <div className="flex items-center justify-between w-full">
+                            <span>{personality.name}</span>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                deletePersonality(personality.id);
+                              }}
+                              className="ml-2 h-6 w-6 p-0"
+                            >
+                              <Trash2 className="w-3 h-3" />
+                            </Button>
+                          </div>
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              )}
+
+              {/* Create New Personality */}
+              {!isCreatingPersonality && settings.savedPersonalities.length < 5 && (
+                <Button
+                  variant="outline"
+                  onClick={() => setIsCreatingPersonality(true)}
+                  className="w-full"
+                >
+                  <Plus className="w-4 h-4 mr-2" />
+                  Create New Personality
+                </Button>
+              )}
+
+              {/* New Personality Form */}
+              {isCreatingPersonality && (
+                <div className="space-y-3 p-4 border rounded-lg">
+                  <div className="space-y-2">
+                    <Label htmlFor="personality-name" className="text-sm text-muted-foreground">
+                      Personality Name
+                    </Label>
+                    <Input
+                      id="personality-name"
+                      placeholder="E.g., Caring Sarah, Playful Emma"
+                      value={newPersonalityName}
+                      onChange={(e) => setNewPersonalityName(e.target.value)}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="personality-description" className="text-sm text-muted-foreground">
+                      Personality Description
+                    </Label>
+                    <Textarea
+                      id="personality-description"
+                      placeholder="E.g., Be caring, playful, and supportive. Show interest in my hobbies and always be encouraging..."
+                      value={newPersonalityDescription}
+                      onChange={(e) => setNewPersonalityDescription(e.target.value)}
+                      className="min-h-[100px]"
+                    />
+                  </div>
+                  <div className="flex gap-2">
+                    <Button
+                      onClick={() => {
+                        if (newPersonalityName.trim() && newPersonalityDescription.trim()) {
+                          const success = addPersonality(newPersonalityName.trim(), newPersonalityDescription.trim());
+                          if (success) {
+                            setNewPersonalityName('');
+                            setNewPersonalityDescription('');
+                            setIsCreatingPersonality(false);
+                            toast({
+                              title: "Personality Created",
+                              description: "Your new AI personality has been saved!",
+                            });
+                          } else {
+                            toast({
+                              title: "Limit Reached",
+                              description: "You can only have up to 5 personalities.",
+                              variant: "destructive",
+                            });
+                          }
+                        } else {
+                          toast({
+                            title: "Missing Information",
+                            description: "Please provide both name and description.",
+                            variant: "destructive",
+                          });
+                        }
+                      }}
+                      size="sm"
+                    >
+                      Save
+                    </Button>
+                    <Button
+                      variant="outline"
+                      onClick={() => {
+                        setIsCreatingPersonality(false);
+                        setNewPersonalityName('');
+                        setNewPersonalityDescription('');
+                      }}
+                      size="sm"
+                    >
+                      Cancel
+                    </Button>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+      </CardContent>
+    </Card>
+  );
+};
