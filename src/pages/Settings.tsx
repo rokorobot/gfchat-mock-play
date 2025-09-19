@@ -336,20 +336,6 @@ const Settings = () => {
                       </SelectContent>
                     </Select>
                   </div>
-                  <div className="space-y-2">
-                    <Label className="text-sm text-muted-foreground flex items-center justify-between">
-                      Voice Volume
-                      <span className="text-xs">{settings.voiceVolume}%</span>
-                    </Label>
-                    <Slider
-                      value={[settings.voiceVolume]}
-                      onValueChange={(value) => updateSettings({ voiceVolume: value[0] })}
-                      max={100}
-                      min={0}
-                      step={5}
-                      className="w-full"
-                    />
-                  </div>
                 </div>
               </div>
             </CardContent>
