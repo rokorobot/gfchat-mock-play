@@ -92,10 +92,7 @@ const Settings = () => {
                 <div className="flex items-center justify-between p-4 border rounded-lg">
                   <div className="flex items-center gap-3">
                     <Bot className="w-5 h-5 text-primary" />
-                    <div>
-                      <Label className="text-sm font-medium">Use Default AI</Label>
-                      <p className="text-xs text-muted-foreground">Switch to the default AI personality</p>
-                    </div>
+                    <Label className="text-sm font-medium">Use Default AI</Label>
                   </div>
                   <Switch
                     checked={settings.useDefaultAI}
