@@ -1,8 +1,17 @@
 import React, { useState, useEffect, createContext, useContext } from 'react';
 import type { ReactNode } from 'react';
 
+export interface SavedPersonality {
+  id: string;
+  name: string;
+  description: string;
+  createdAt: Date;
+}
+
 export interface AppSettings {
-  personality: string;
+  useDefaultAI: boolean;
+  currentPersonality: string;
+  savedPersonalities: SavedPersonality[];
   voiceMode: boolean;
   voiceType: string;
   voiceVolume: number;
@@ -11,7 +20,9 @@ export interface AppSettings {
 }
 
 const defaultSettings: AppSettings = {
-  personality: '',
+  useDefaultAI: true,
+  currentPersonality: '',
+  savedPersonalities: [],
   voiceMode: true,
   voiceType: 'nova',
   voiceVolume: 80,
@@ -23,6 +34,9 @@ const SettingsContext = createContext<{
   settings: AppSettings;
   updateSettings: (newSettings: Partial<AppSettings>) => void;
   saveSettings: () => Promise<void>;
+  addPersonality: (name: string, description: string) => boolean;
+  deletePersonality: (id: string) => void;
+  getCurrentPersonalityText: () => string;
 } | null>(null);
 
 export const useSettings = () => {
@@ -59,6 +73,54 @@ export const SettingsProvider: React.FC<SettingsProviderProps> = ({ children }) 
     setSettings(prev => ({ ...prev, ...newSettings }));
   };
 
+  const addPersonality = (name: string, description: string): boolean => {
+    if (settings.savedPersonalities.length >= 5) {
+      return false; // Max limit reached
+    }
+    
+    const newPersonality: SavedPersonality = {
+      id: crypto.randomUUID(),
+      name,
+      description,
+      createdAt: new Date(),
+    };
+    
+    setSettings(prev => ({
+      ...prev,
+      savedPersonalities: [...prev.savedPersonalities, newPersonality],
+      currentPersonality: newPersonality.id,
+      useDefaultAI: false,
+    }));
+    
+    return true;
+  };
+
+  const deletePersonality = (id: string) => {
+    setSettings(prev => {
+      const updatedPersonalities = prev.savedPersonalities.filter(p => p.id !== id);
+      const newCurrentPersonality = prev.currentPersonality === id ? '' : prev.currentPersonality;
+      
+      return {
+        ...prev,
+        savedPersonalities: updatedPersonalities,
+        currentPersonality: newCurrentPersonality,
+        useDefaultAI: newCurrentPersonality === '' || prev.useDefaultAI,
+      };
+    });
+  };
+
+  const getCurrentPersonalityText = (): string => {
+    if (settings.useDefaultAI) {
+      return '';
+    }
+    
+    const currentPersonality = settings.savedPersonalities.find(
+      p => p.id === settings.currentPersonality
+    );
+    
+    return currentPersonality?.description || '';
+  };
+
   const saveSettings = async () => {
     try {
       localStorage.setItem('app-settings', JSON.stringify(settings));
@@ -75,7 +137,14 @@ export const SettingsProvider: React.FC<SettingsProviderProps> = ({ children }) 
   }
 
   return (
-    <SettingsContext.Provider value={{ settings, updateSettings, saveSettings }}>
+    <SettingsContext.Provider value={{ 
+      settings, 
+      updateSettings, 
+      saveSettings, 
+      addPersonality, 
+      deletePersonality, 
+      getCurrentPersonalityText 
+    }}>
       {children}
     </SettingsContext.Provider>
   );
