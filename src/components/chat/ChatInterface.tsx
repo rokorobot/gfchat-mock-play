@@ -213,7 +213,7 @@ export const ChatInterface: React.FC = () => {
         <div className="text-center">
           <h2 className="text-xl font-semibold text-card-foreground mb-1">Your AI Girlfriend</h2>
           <p className="text-sm text-muted-foreground flex items-center justify-center gap-2">
-            <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+            <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse inline-block"></span>
             Online and ready to chat
             <Heart className="w-4 h-4 text-primary fill-primary/20" />
           </p>
