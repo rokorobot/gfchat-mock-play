@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { useToast } from '@/components/ui/use-toast';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 // Extend Window interface to include Speech Recognition APIs
 declare global {
@@ -23,10 +24,11 @@ export const useVoiceInput = (options: UseVoiceInputOptions = {}) => {
   const [isSupported, setIsSupported] = useState(false);
   const recognitionRef = useRef<any>(null);
   const { toast } = useToast();
+  const isMobile = useIsMobile();
 
   const {
     language = 'en-US',
-    continuous = false,
+    continuous = isMobile ? true : false, // Enable continuous mode on mobile for longer listening
     interimResults = true,
     onResult,
     onError
