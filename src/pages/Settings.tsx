@@ -129,7 +129,7 @@ const Settings = () => {
                     {settings.savedPersonalities.length > 0 && (
                       <div className="space-y-2">
                         <Label htmlFor="personality-select" className="text-sm text-muted-foreground">
-                          Select Personality
+                          Select Customised Personality
                         </Label>
                         <Select 
                           value={settings.currentPersonality} 
