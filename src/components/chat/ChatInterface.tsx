@@ -28,6 +28,17 @@ export const ChatInterface: React.FC = () => {
   const { speak, isLoading: isSpeaking } = useTextToSpeech();
   const { settings } = useSettings();
 
+  // Add safety check for settings
+  if (!settings) {
+    return (
+      <div className="flex items-center justify-center h-screen bg-gradient-chat">
+        <div className="text-center">
+          <div className="text-lg">Loading...</div>
+        </div>
+      </div>
+    );
+  }
+
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
@@ -38,14 +49,14 @@ export const ChatInterface: React.FC = () => {
 
   // Auto-speak new AI responses
   useEffect(() => {
-    if (isLoading || !settings.voiceMode) return; // Don't speak during initial load or if voice mode is off
+    if (isLoading || !settings?.voiceMode) return; // Don't speak during initial load or if voice mode is off
     
     const lastMessage = messages[messages.length - 1];
     if (lastMessage && !lastMessage.isUser && lastMessage.id !== lastAiMessageId) {
       setLastAiMessageId(lastMessage.id);
-      speak(lastMessage.content, settings.voiceType);
+      speak(lastMessage.content, settings.voiceType || 'alloy');
     }
-  }, [messages, isLoading, lastAiMessageId, speak, settings.voiceMode, settings.voiceType]);
+  }, [messages, isLoading, lastAiMessageId, speak, settings?.voiceMode, settings?.voiceType]);
 
   // Load existing messages on mount
   useEffect(() => {

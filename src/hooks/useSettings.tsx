@@ -39,6 +39,7 @@ interface SettingsProviderProps {
 
 export const SettingsProvider: React.FC<SettingsProviderProps> = ({ children }) => {
   const [settings, setSettings] = useState<AppSettings>(defaultSettings);
+  const [isLoaded, setIsLoaded] = useState(false);
 
   // Load settings from localStorage on mount
   useEffect(() => {
@@ -51,6 +52,7 @@ export const SettingsProvider: React.FC<SettingsProviderProps> = ({ children }) 
         console.error('Error loading settings:', error);
       }
     }
+    setIsLoaded(true);
   }, []);
 
   const updateSettings = (newSettings: Partial<AppSettings>) => {
@@ -66,6 +68,11 @@ export const SettingsProvider: React.FC<SettingsProviderProps> = ({ children }) 
       return Promise.reject(error);
     }
   };
+
+  // Don't render children until settings are loaded
+  if (!isLoaded) {
+    return null;
+  }
 
   return (
     <SettingsContext.Provider value={{ settings, updateSettings, saveSettings }}>

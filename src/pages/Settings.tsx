@@ -18,6 +18,17 @@ const Settings = () => {
   const { toast } = useToast();
   const [isSaving, setIsSaving] = useState(false);
 
+  // Safety check - return loading if settings not yet loaded
+  if (!settings) {
+    return (
+      <div className="min-h-screen bg-gradient-chat p-4 flex items-center justify-center">
+        <div className="text-center">
+          <div className="text-lg">Loading settings...</div>
+        </div>
+      </div>
+    );
+  }
+
   const handleSave = async () => {
     setIsSaving(true);
     try {
