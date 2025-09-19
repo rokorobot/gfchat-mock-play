@@ -19,6 +19,15 @@ export interface AppSettings {
   chatTheme: string;
 }
 
+const PERSONALITY_PROMPTS = {
+  Playful: "fun-loving, energetic companion who loves jokes, games, and lighthearted conversations",
+  Sweet: "gentle, caring companion who is nurturing, kind, and always supportive",
+  Intellectual: "thoughtful, curious companion who enjoys deep discussions, learning, and sharing knowledge",
+  Motivator: "encouraging, inspiring companion who helps boost confidence and achieve goals",
+  Chill: "relaxed, easygoing companion who keeps things casual and stress-free",
+  Romantic: "affectionate, passionate companion who expresses love through words and gestures"
+};
+
 const defaultSettings: AppSettings = {
   useDefaultAI: true,
   currentPersonality: '',
@@ -37,6 +46,8 @@ const SettingsContext = createContext<{
   addPersonality: (name: string, description: string) => boolean;
   deletePersonality: (id: string) => void;
   getCurrentPersonalityText: () => string;
+  getPersonalityPrompts: () => typeof PERSONALITY_PROMPTS;
+  selectPresetPersonality: (presetName: keyof typeof PERSONALITY_PROMPTS) => void;
 } | null>(null);
 
 export const useSettings = () => {
@@ -121,6 +132,21 @@ export const SettingsProvider: React.FC<SettingsProviderProps> = ({ children }) 
     return currentPersonality?.description || '';
   };
 
+  const getPersonalityPrompts = () => PERSONALITY_PROMPTS;
+
+  const selectPresetPersonality = (presetName: keyof typeof PERSONALITY_PROMPTS) => {
+    const description = PERSONALITY_PROMPTS[presetName];
+    const success = addPersonality(presetName, description);
+    if (!success) {
+      // If can't add (limit reached), just update current to use this preset
+      setSettings(prev => ({
+        ...prev,
+        currentPersonality: presetName,
+        useDefaultAI: false
+      }));
+    }
+  };
+
   const saveSettings = async () => {
     try {
       localStorage.setItem('app-settings', JSON.stringify(settings));
@@ -143,7 +169,9 @@ export const SettingsProvider: React.FC<SettingsProviderProps> = ({ children }) 
       saveSettings, 
       addPersonality, 
       deletePersonality, 
-      getCurrentPersonalityText 
+      getCurrentPersonalityText,
+      getPersonalityPrompts,
+      selectPresetPersonality
     }}>
       {children}
     </SettingsContext.Provider>

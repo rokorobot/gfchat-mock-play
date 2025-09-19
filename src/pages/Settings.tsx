@@ -15,7 +15,7 @@ import { useToast } from '@/components/ui/use-toast';
 
 const Settings = () => {
   const navigate = useNavigate();
-  const { settings, updateSettings, saveSettings, addPersonality, deletePersonality, getCurrentPersonalityText } = useSettings();
+  const { settings, updateSettings, saveSettings, addPersonality, deletePersonality, getCurrentPersonalityText, getPersonalityPrompts, selectPresetPersonality } = useSettings();
   const { toast } = useToast();
   const [isSaving, setIsSaving] = useState(false);
   const [isCreatingPersonality, setIsCreatingPersonality] = useState(false);
@@ -105,6 +105,27 @@ const Settings = () => {
 
                 {!settings.useDefaultAI && (
                   <div className="space-y-4">
+                    {/* Quick Personality Selection */}
+                    <div className="space-y-3">
+                      <Label className="text-sm text-muted-foreground">Quick Select Personality</Label>
+                      <div className="grid grid-cols-2 gap-2">
+                        {Object.entries(getPersonalityPrompts()).map(([name, description]) => (
+                          <Button
+                            key={name}
+                            variant="outline"
+                            size="sm"
+                            onClick={() => selectPresetPersonality(name as keyof ReturnType<typeof getPersonalityPrompts>)}
+                            className="h-auto p-3 text-left justify-start"
+                          >
+                            <div>
+                              <div className="font-medium text-xs">{name}</div>
+                              <div className="text-xs text-muted-foreground truncate">{String(description).slice(0, 40)}...</div>
+                            </div>
+                          </Button>
+                        ))}
+                      </div>
+                    </div>
+
                     {/* Saved Personalities Dropdown */}
                     {settings.savedPersonalities.length > 0 && (
                       <div className="space-y-2">
