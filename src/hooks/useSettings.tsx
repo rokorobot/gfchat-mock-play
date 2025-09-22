@@ -74,6 +74,15 @@ export const SettingsProvider: React.FC<SettingsProviderProps> = ({ children }) 
     if (savedSettings) {
       try {
         const parsedSettings = JSON.parse(savedSettings);
+        
+        // Migration: Convert old voiceMode to separate voiceInput/voiceOutput
+        if ('voiceMode' in parsedSettings && !('voiceInput' in parsedSettings || 'voiceOutput' in parsedSettings)) {
+          const { voiceMode, ...rest } = parsedSettings;
+          parsedSettings.voiceInput = voiceMode;
+          parsedSettings.voiceOutput = voiceMode;
+          delete parsedSettings.voiceMode;
+        }
+        
         setSettings({ ...defaultSettings, ...parsedSettings });
       } catch (error) {
         console.error('Error loading settings:', error);
