@@ -253,22 +253,37 @@ export const AIConfigurationTab = () => {
             Voice Settings
           </Label>
           <div className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="voice-type" className="text-sm text-muted-foreground">
-                Voice Type
-              </Label>
-              <Select value={settings.voiceType} onValueChange={(value) => updateSettings({ voiceType: value })}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Choose voice" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="alloy">Alloy - Neutral & Clear</SelectItem>
-                  <SelectItem value="fable">Fable - Warm & Expressive</SelectItem>
-                  <SelectItem value="nova">Nova - Bright & Energetic</SelectItem>
-                  <SelectItem value="shimmer">Shimmer - Light & Airy</SelectItem>
-                </SelectContent>
-              </Select>
+            {/* Voice Output Toggle */}
+            <div className="flex items-center justify-between p-4 border rounded-lg">
+              <div className="flex items-center gap-3">
+                <span className="text-2xl">🔊</span>
+                <Label className="text-sm font-medium">Voice Output</Label>
+              </div>
+              <Switch
+                checked={settings.voiceMode}
+                onCheckedChange={(checked) => updateSettings({ voiceMode: checked })}
+              />
             </div>
+            
+            {/* Voice Type Selection - only show when voice is enabled */}
+            {settings.voiceMode && (
+              <div className="space-y-2">
+                <Label htmlFor="voice-type" className="text-sm text-muted-foreground">
+                  Voice Type
+                </Label>
+                <Select value={settings.voiceType} onValueChange={(value) => updateSettings({ voiceType: value })}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Choose voice" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="alloy">Alloy - Neutral & Clear</SelectItem>
+                    <SelectItem value="fable">Fable - Warm & Expressive</SelectItem>
+                    <SelectItem value="nova">Nova - Bright & Energetic</SelectItem>
+                    <SelectItem value="shimmer">Shimmer - Light & Airy</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
           </div>
         </div>
       </CardContent>
