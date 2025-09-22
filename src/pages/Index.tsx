@@ -10,7 +10,10 @@ const Index = () => {
   const { isAuthenticated, user, logout } = useAuth();
 
   useEffect(() => {
-    if (!isAuthenticated) {
+    // Don't redirect if there's an access token in the URL (email confirmation flow)
+    const hasAccessToken = window.location.hash.includes('access_token=');
+    
+    if (!isAuthenticated && !hasAccessToken) {
       navigate('/auth');
     }
   }, [isAuthenticated, navigate]);
@@ -20,7 +23,10 @@ const Index = () => {
     navigate('/');
   };
 
-  if (!isAuthenticated) {
+  // Show loading state while processing access token from URL
+  const hasAccessToken = window.location.hash.includes('access_token=');
+  
+  if (!isAuthenticated && !hasAccessToken) {
     return (
       <div className="min-h-screen bg-gradient-chat flex items-center justify-center p-4">
         <div className="text-center space-y-4">
@@ -34,6 +40,22 @@ const Index = () => {
           <Button onClick={() => navigate('/auth')}>
             Sign In
           </Button>
+        </div>
+      </div>
+    );
+  }
+  
+  if (!isAuthenticated && hasAccessToken) {
+    return (
+      <div className="min-h-screen bg-gradient-chat flex items-center justify-center p-4">
+        <div className="text-center space-y-4">
+          <div className="w-16 h-16 rounded-full bg-gradient-primary flex items-center justify-center mx-auto">
+            <Heart className="w-8 h-8 text-white fill-white" />
+          </div>
+          <h1 className="text-2xl font-bold bg-gradient-primary bg-clip-text text-transparent">
+            Verifying your account...
+          </h1>
+          <p className="text-muted-foreground">Please wait while we confirm your email</p>
         </div>
       </div>
     );
