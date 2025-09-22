@@ -16,7 +16,8 @@ export const useTextToSpeech = () => {
       });
 
       if (error) {
-        throw error;
+        console.error('Supabase TTS Error:', error);
+        throw new Error(`TTS service error: ${error.message}`);
       }
 
       if (data?.audioContent) {
@@ -28,17 +29,40 @@ export const useTextToSpeech = () => {
         const audioUrl = URL.createObjectURL(audioBlob);
         const audio = new Audio(audioUrl);
         
+        // Handle iOS Safari audio restrictions
+        const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+        
         audio.onended = () => {
           URL.revokeObjectURL(audioUrl);
         };
         
-        await audio.play();
+        audio.onerror = (e) => {
+          console.error('Audio playback error:', e);
+          URL.revokeObjectURL(audioUrl);
+          throw new Error('Audio playback failed - check your device audio settings');
+        };
+        
+        try {
+          await audio.play();
+        } catch (playError) {
+          console.error('Audio play error:', playError);
+          URL.revokeObjectURL(audioUrl);
+          
+          if (isIOS && playError.name === 'NotAllowedError') {
+            throw new Error('Audio blocked - tap to enable speech in browser settings');
+          } else {
+            throw new Error(`Audio playback failed: ${playError.message}`);
+          }
+        }
+      } else {
+        throw new Error('No audio content received from TTS service');
       }
     } catch (error) {
       console.error('TTS Error:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Failed to generate speech';
       toast({
         title: 'Speech Error',
-        description: 'Failed to generate speech',
+        description: errorMessage,
         variant: 'destructive'
       });
     } finally {
