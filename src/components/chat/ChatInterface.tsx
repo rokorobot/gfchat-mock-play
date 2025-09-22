@@ -49,14 +49,14 @@ export const ChatInterface: React.FC = () => {
 
   // Auto-speak new AI responses
   useEffect(() => {
-    if (isLoading || !settings?.voiceMode) return; // Don't speak during initial load or if voice mode is off
+    if (isLoading || !settings?.voiceOutput) return; // Don't speak during initial load or if voice output is off
     
     const lastMessage = messages[messages.length - 1];
     if (lastMessage && !lastMessage.isUser && lastMessage.id !== lastAiMessageId) {
       setLastAiMessageId(lastMessage.id);
       speak(lastMessage.content, settings.voiceType || 'alloy');
     }
-  }, [messages, isLoading, lastAiMessageId, speak, settings?.voiceMode, settings?.voiceType]);
+  }, [messages, isLoading, lastAiMessageId, speak, settings?.voiceOutput, settings?.voiceType]);
 
   // Load existing messages on mount
   useEffect(() => {

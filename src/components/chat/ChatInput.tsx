@@ -68,8 +68,8 @@ export const ChatInput: React.FC<ChatInputProps> = ({
         )}
       />
       
-      {/* Voice Input Button - only show if voice mode is enabled and supported */}
-      {settings?.voiceMode && isVoiceSupported && (
+      {/* Voice Input Button - only show if voice input is enabled and supported */}
+      {settings?.voiceInput && isVoiceSupported && (
         <Button
           onClick={toggleListening}
           disabled={disabled}

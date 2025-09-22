@@ -36,8 +36,8 @@ export const YouConfigurationTab = () => {
               <Label className="text-sm font-medium">Enable Voice Input</Label>
             </div>
             <Switch
-              checked={settings.voiceMode}
-              onCheckedChange={(checked) => updateSettings({ voiceMode: checked })}
+              checked={settings.voiceInput}
+              onCheckedChange={(checked) => updateSettings({ voiceInput: checked })}
             />
           </div>
         </div>

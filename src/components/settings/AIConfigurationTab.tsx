@@ -260,13 +260,13 @@ export const AIConfigurationTab = () => {
                 <Label className="text-sm font-medium">Voice Output</Label>
               </div>
               <Switch
-                checked={settings.voiceMode}
-                onCheckedChange={(checked) => updateSettings({ voiceMode: checked })}
+                checked={settings.voiceOutput}
+                onCheckedChange={(checked) => updateSettings({ voiceOutput: checked })}
               />
             </div>
             
-            {/* Voice Type Selection - only show when voice is enabled */}
-            {settings.voiceMode && (
+            {/* Voice Type Selection - only show when voice output is enabled */}
+            {settings.voiceOutput && (
               <div className="space-y-2">
                 <Label htmlFor="voice-type" className="text-sm text-muted-foreground">
                   Voice Type

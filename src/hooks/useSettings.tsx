@@ -12,7 +12,8 @@ export interface AppSettings {
   useDefaultAI: boolean;
   currentPersonality: string;
   savedPersonalities: SavedPersonality[];
-  voiceMode: boolean;
+  voiceInput: boolean;
+  voiceOutput: boolean;
   voiceType: string;
   voiceVolume: number;
   avatarStyle: string;
@@ -32,7 +33,8 @@ const defaultSettings: AppSettings = {
   useDefaultAI: true,
   currentPersonality: '',
   savedPersonalities: [],
-  voiceMode: true,
+  voiceInput: false,
+  voiceOutput: true,
   voiceType: 'nova',
   voiceVolume: 80,
   avatarStyle: 'realistic',
