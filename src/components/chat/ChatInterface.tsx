@@ -216,7 +216,7 @@ export const ChatInterface: React.FC = () => {
     <div className="flex flex-col h-screen bg-gradient-chat">
       {/* Header with large GF Avatar */}
       <div className="flex flex-col items-center p-6 border-b border-border bg-card/80 backdrop-blur-sm">
-        <div className="relative w-32 h-32 rounded-full overflow-hidden shadow-lg mb-4 bg-gradient-to-br from-primary to-accent p-1">
+        <div className="relative w-48 h-48 rounded-full overflow-hidden shadow-lg bg-gradient-to-br from-primary to-accent p-1">
           <div className="w-full h-full rounded-full overflow-hidden bg-white">
             <img 
               src={gfAvatar} 
@@ -224,14 +224,6 @@ export const ChatInterface: React.FC = () => {
               className="w-full h-full object-cover"
             />
           </div>
-        </div>
-        <div className="text-center">
-          <h2 className="text-xl font-semibold text-card-foreground mb-1">Your AI Girlfriend</h2>
-          <p className="text-sm text-muted-foreground flex items-center justify-center gap-2">
-            <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse inline-block"></span>
-            Online and ready to chat
-            <Heart className="w-4 h-4 text-primary fill-primary/20" />
-          </p>
         </div>
       </div>
 
