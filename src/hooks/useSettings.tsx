@@ -18,6 +18,8 @@ export interface AppSettings {
   voiceVolume: number;
   avatarStyle: string;
   chatTheme: string;
+  age: number;
+  gender: 'male' | 'female';
 }
 
 const PERSONALITY_PROMPTS = {
@@ -39,6 +41,8 @@ const defaultSettings: AppSettings = {
   voiceVolume: 80,
   avatarStyle: 'realistic',
   chatTheme: 'romantic',
+  age: 25,
+  gender: 'female',
 };
 
 const SettingsContext = createContext<{
