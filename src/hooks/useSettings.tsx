@@ -20,6 +20,7 @@ export interface AppSettings {
   chatTheme: string;
   age: number;
   gender: 'male' | 'female';
+  aiGender: 'male' | 'female';
 }
 
 const PERSONALITY_PROMPTS = {
@@ -43,6 +44,7 @@ const defaultSettings: AppSettings = {
   chatTheme: 'romantic',
   age: 25,
   gender: 'female',
+  aiGender: 'female',
 };
 
 const SettingsContext = createContext<{

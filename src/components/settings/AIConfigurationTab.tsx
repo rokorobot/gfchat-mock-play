@@ -3,7 +3,8 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { Switch } from '@/components/ui/switch';
-import { Bot, Plus, Trash2 } from 'lucide-react';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { Bot, Plus, Trash2, User } from 'lucide-react';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -202,10 +203,42 @@ export const AIConfigurationTab = () => {
 
         <Separator />
 
-        {/* Appearance Section */}
+        {/* AI Gender Section */}
         <div className="space-y-3">
           <Label className="text-base font-medium flex items-center gap-2">
             <span className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center text-xs font-bold">2</span>
+            AI Gender
+          </Label>
+          <div className="p-4 border rounded-lg">
+            <RadioGroup
+              value={settings.aiGender}
+              onValueChange={(value) => updateSettings({ aiGender: value as 'male' | 'female', voiceType: value === 'male' ? 'onyx' : 'nova' })}
+              className="flex gap-6"
+            >
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="male" id="ai-male" />
+                <Label htmlFor="ai-male" className="text-sm font-medium flex items-center gap-2">
+                  <User className="w-4 h-4" />
+                  Male
+                </Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="female" id="ai-female" />
+                <Label htmlFor="ai-female" className="text-sm font-medium flex items-center gap-2">
+                  <User className="w-4 h-4" />
+                  Female
+                </Label>
+              </div>
+            </RadioGroup>
+          </div>
+        </div>
+
+        <Separator />
+
+        {/* Appearance Section */}
+        <div className="space-y-3">
+          <Label className="text-base font-medium flex items-center gap-2">
+            <span className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center text-xs font-bold">3</span>
             Appearance
           </Label>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -249,7 +282,7 @@ export const AIConfigurationTab = () => {
         {/* Voice Settings Section */}
         <div className="space-y-3">
           <Label className="text-base font-medium flex items-center gap-2">
-            <span className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center text-xs font-bold">3</span>
+            <span className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center text-xs font-bold">4</span>
             Voice Settings
           </Label>
           <div className="space-y-4">
@@ -276,10 +309,19 @@ export const AIConfigurationTab = () => {
                     <SelectValue placeholder="Choose voice" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="alloy">Alloy - Neutral & Clear</SelectItem>
-                    <SelectItem value="fable">Fable - Warm & Expressive</SelectItem>
-                    <SelectItem value="nova">Nova - Bright & Energetic</SelectItem>
-                    <SelectItem value="shimmer">Shimmer - Light & Airy</SelectItem>
+                    {settings.aiGender === 'female' ? (
+                      <>
+                        <SelectItem value="nova">Nova - Bright & Energetic</SelectItem>
+                        <SelectItem value="shimmer">Shimmer - Light & Airy</SelectItem>
+                        <SelectItem value="alloy">Alloy - Neutral & Clear</SelectItem>
+                      </>
+                    ) : (
+                      <>
+                        <SelectItem value="onyx">Onyx - Deep & Confident</SelectItem>
+                        <SelectItem value="echo">Echo - Smooth & Professional</SelectItem>
+                        <SelectItem value="fable">Fable - Warm & Expressive</SelectItem>
+                      </>
+                    )}
                   </SelectContent>
                 </Select>
               </div>
