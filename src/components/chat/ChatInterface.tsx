@@ -9,6 +9,7 @@ import { useSettings } from '@/hooks/useSettings';
 import { Heart } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import gfAvatar from '@/assets/gf-avatar.png';
+import maleAvatar from '@/assets/male-avatar.png';
 
 interface Message {
   id: string;
@@ -219,8 +220,8 @@ export const ChatInterface: React.FC = () => {
         <div className="relative w-48 h-48 rounded-full overflow-hidden shadow-lg bg-gradient-to-br from-primary to-accent p-1">
           <div className="w-full h-full rounded-full overflow-hidden bg-white">
             <img 
-              src={gfAvatar} 
-              alt="Your AI Girlfriend" 
+              src={settings.aiGender === 'male' ? maleAvatar : gfAvatar} 
+              alt={settings.aiGender === 'male' ? "Your AI Boyfriend" : "Your AI Girlfriend"} 
               className="w-full h-full object-cover"
             />
           </div>
