@@ -6,7 +6,8 @@ import { useAuth } from '@/context/AuthContext';
 import { useToast } from '@/components/ui/use-toast';
 import { useTextToSpeech } from '@/hooks/useTextToSpeech';
 import { useSettings } from '@/hooks/useSettings';
-import { Heart } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Heart, RotateCcw } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import gfAvatar from '@/assets/gf-avatar.png';
 import maleAvatar from '@/assets/male-avatar.png';
@@ -213,10 +214,72 @@ export const ChatInterface: React.FC = () => {
     }
   };
 
+  const handleResetChat = async () => {
+    if (!user) return;
+
+    try {
+      // Clear messages from database
+      const { error } = await supabase
+        .from('messages')
+        .delete()
+        .eq('user_id', user.id);
+
+      if (error) {
+        console.error('Error clearing messages:', error);
+        toast({
+          title: "Error",
+          description: "Failed to reset chat. Please try again.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // Clear local messages
+      setMessages([]);
+      setLastAiMessageId('');
+
+      toast({
+        title: "Chat Reset",
+        description: "Your conversation has been cleared.",
+      });
+
+      // Send new welcome message after a brief delay
+      setTimeout(async () => {
+        const welcomeMessage = "Hi! I'm your AI girlfriend and I'm so excited to chat with you! 💕 How are you doing today?";
+        
+        const { error: insertError } = await supabase
+          .from('messages')
+          .insert({
+            user_id: user.id,
+            content: welcomeMessage,
+            is_user: false,
+          });
+
+        if (!insertError) {
+          const message: Message = {
+            id: 'welcome-new',
+            content: welcomeMessage,
+            isUser: false,
+            timestamp: new Date(),
+          };
+          setMessages([message]);
+        }
+      }, 500);
+
+    } catch (error) {
+      console.error('Error resetting chat:', error);
+      toast({
+        title: "Error",
+        description: "Failed to reset chat. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
   return (
     <div className="flex flex-col h-screen bg-gradient-chat">
       {/* Header with large GF Avatar */}
-      <div className="flex flex-col items-center p-6 border-b border-border bg-card/80 backdrop-blur-sm">
+      <div className="flex flex-col items-center p-6 border-b border-border bg-card/80 backdrop-blur-sm relative">
         <div className="relative w-48 h-48 rounded-full overflow-hidden shadow-lg bg-gradient-to-br from-primary to-accent p-1">
           <div className="w-full h-full rounded-full overflow-hidden bg-white">
             <img 
@@ -226,6 +289,17 @@ export const ChatInterface: React.FC = () => {
             />
           </div>
         </div>
+        
+        {/* Reset button positioned at lower right corner */}
+        <Button
+          variant="outline"
+          size="icon"
+          onClick={handleResetChat}
+          className="absolute bottom-4 right-4 h-8 w-8 rounded-full bg-background/80 backdrop-blur-sm hover:bg-background/90"
+          title="Reset Chat"
+        >
+          <RotateCcw className="h-4 w-4" />
+        </Button>
       </div>
 
       {/* Messages */}
