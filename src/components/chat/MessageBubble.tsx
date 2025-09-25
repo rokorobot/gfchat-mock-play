@@ -1,19 +1,22 @@
 import React from 'react';
 import { cn } from '@/lib/utils';
 import gfAvatar from '@/assets/gf-avatar.png';
+import maleAvatar from '@/assets/male-avatar.png';
 
 interface MessageBubbleProps {
   message: string;
   isUser: boolean;
   timestamp: Date;
   avatar?: string;
+  aiGender?: 'male' | 'female';
 }
 
 export const MessageBubble: React.FC<MessageBubbleProps> = ({
   message,
   isUser,
   timestamp,
-  avatar
+  avatar,
+  aiGender = 'female'
 }) => {
   return (
     <div className={cn(
@@ -24,8 +27,8 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({
         <div className="relative w-8 h-8 rounded-full overflow-hidden shadow-sm bg-gradient-to-br from-primary to-accent p-0.5">
           <div className="w-full h-full rounded-full overflow-hidden bg-white">
             <img 
-              src={avatar || gfAvatar} 
-              alt="GF Avatar" 
+              src={avatar || (aiGender === 'male' ? maleAvatar : gfAvatar)} 
+              alt={aiGender === 'male' ? "AI Boyfriend Avatar" : "AI Girlfriend Avatar"} 
               className="w-full h-full object-cover"
             />
           </div>

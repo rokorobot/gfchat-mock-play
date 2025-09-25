@@ -317,6 +317,7 @@ export const ChatInterface: React.FC = () => {
                 isUser={message.isUser}
                 timestamp={message.timestamp}
                 avatar={message.isUser ? "👤" : undefined}
+                aiGender={settings.aiGender}
               />
             ))}
             <TypingIndicator isVisible={isTyping} />
