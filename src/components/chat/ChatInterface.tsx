@@ -88,7 +88,7 @@ export const ChatInterface: React.FC = () => {
         } else {
           // Send initial welcome message if no messages exist
           setTimeout(async () => {
-            const welcomeMessage = "Hi! I'm your AI girlfriend and I'm so excited to chat with you! 💕 How are you doing today?";
+            const welcomeMessage = `Hi! I'm your AI ${settings.aiGender === 'male' ? 'boyfriend' : 'girlfriend'} and I'm so excited to chat with you! 💕 How are you doing today?`;
             
             const { error: insertError } = await supabase
               .from('messages')
@@ -245,7 +245,7 @@ export const ChatInterface: React.FC = () => {
 
       // Send new welcome message after a brief delay
       setTimeout(async () => {
-        const welcomeMessage = "Hi! I'm your AI girlfriend and I'm so excited to chat with you! 💕 How are you doing today?";
+        const welcomeMessage = `Hi! I'm your AI ${settings.aiGender === 'male' ? 'boyfriend' : 'girlfriend'} and I'm so excited to chat with you! 💕 How are you doing today?`;
         
         const { error: insertError } = await supabase
           .from('messages')
