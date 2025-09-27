@@ -7,24 +7,37 @@ import { Heart, LogOut, Settings } from 'lucide-react';
 
 const Index = () => {
   const navigate = useNavigate();
-  const { isAuthenticated, user, logout } = useAuth();
+  const { isAuthenticated, user, logout, isLoading } = useAuth();
 
   useEffect(() => {
-    // Don't redirect if there's an access token in the URL (email confirmation flow)
+    // Don't redirect if still loading auth state or if there's an access token in the URL
     const hasAccessToken = window.location.hash.includes('access_token=');
     
-    if (!isAuthenticated && !hasAccessToken) {
+    if (!isLoading && !isAuthenticated && !hasAccessToken) {
       navigate('/auth');
     }
-  }, [isAuthenticated, navigate]);
+  }, [isAuthenticated, isLoading, navigate]);
 
   const handleLogout = async () => {
     await logout();
     navigate('/');
   };
 
-  // Show loading state while processing access token from URL
+  // Show loading state while checking auth or processing access token from URL
   const hasAccessToken = window.location.hash.includes('access_token=');
+  
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gradient-chat flex items-center justify-center p-4">
+        <div className="text-center space-y-4">
+          <div className="w-16 h-16 rounded-full bg-gradient-primary flex items-center justify-center mx-auto">
+            <Heart className="w-8 h-8 text-white fill-white animate-pulse" />
+          </div>
+          <p className="text-muted-foreground">Loading...</p>
+        </div>
+      </div>
+    );
+  }
   
   if (!isAuthenticated && !hasAccessToken) {
     return (

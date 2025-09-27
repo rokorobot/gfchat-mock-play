@@ -6,6 +6,7 @@ interface AuthContextType {
   user: User | null;
   session: Session | null;
   isAuthenticated: boolean;
+  isLoading: boolean;
   logout: () => void;
 }
 
@@ -19,6 +20,7 @@ interface AuthProviderProps {
 export const AuthProvider = ({ children, preview = false }: AuthProviderProps) => {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     if (preview) {
@@ -32,6 +34,7 @@ export const AuthProvider = ({ children, preview = false }: AuthProviderProps) =
         created_at: '2024-01-01T00:00:00Z',
         updated_at: '2024-01-01T00:00:00Z'
       } as User);
+      setIsLoading(false);
       return;
     }
 
@@ -40,6 +43,7 @@ export const AuthProvider = ({ children, preview = false }: AuthProviderProps) =
       (event, session) => {
         setSession(session);
         setUser(session?.user ?? null);
+        setIsLoading(false);
       }
     );
 
@@ -47,6 +51,7 @@ export const AuthProvider = ({ children, preview = false }: AuthProviderProps) =
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
       setUser(session?.user ?? null);
+      setIsLoading(false);
     });
 
     return () => subscription.unsubscribe();
@@ -62,6 +67,7 @@ export const AuthProvider = ({ children, preview = false }: AuthProviderProps) =
     user,
     session,
     isAuthenticated: !!user && !!session,
+    isLoading,
     logout,
   };
 
