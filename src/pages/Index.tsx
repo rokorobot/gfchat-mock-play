@@ -1,13 +1,15 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ChatInterface } from '@/components/chat/ChatInterface';
 import { useAuth } from '@/context/AuthContext';
 import { Button } from '@/components/ui/button';
-import { Heart, LogOut, Settings } from 'lucide-react';
+import { Heart, LogOut, Settings, MessageCircle } from 'lucide-react';
+import { FeedbackDialog } from '@/components/feedback/FeedbackDialog';
 
 const Index = () => {
   const navigate = useNavigate();
   const { isAuthenticated, user, logout, isLoading } = useAuth();
+  const [feedbackOpen, setFeedbackOpen] = useState(false);
 
   useEffect(() => {
     // Don't redirect if still loading auth state or if there's an access token in the URL
@@ -76,7 +78,7 @@ const Index = () => {
 
   return (
     <div className="relative">
-      <div className="absolute top-4 left-4 z-10">
+      <div className="absolute top-4 left-4 z-10 flex flex-col space-y-2">
         <Button 
           variant="ghost" 
           size="icon" 
@@ -84,6 +86,15 @@ const Index = () => {
           className="text-muted-foreground hover:text-foreground"
         >
           <Settings className="w-4 h-4" />
+        </Button>
+        <Button 
+          variant="ghost" 
+          size="icon" 
+          onClick={() => setFeedbackOpen(true)}
+          className="text-muted-foreground hover:text-foreground"
+          title="Send Feedback"
+        >
+          <MessageCircle className="w-4 h-4" />
         </Button>
       </div>
       <div className="absolute top-4 right-4 z-10">
@@ -98,6 +109,7 @@ const Index = () => {
         </Button>
       </div>
       <ChatInterface />
+      <FeedbackDialog open={feedbackOpen} onOpenChange={setFeedbackOpen} />
     </div>
   );
 };
