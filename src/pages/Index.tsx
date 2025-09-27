@@ -78,7 +78,7 @@ const Index = () => {
 
   return (
     <div className="relative">
-      <div className="absolute top-4 left-4 z-10 flex flex-col space-y-2">
+      <div className="absolute top-4 left-4 z-10">
         <Button 
           variant="ghost" 
           size="icon" 
@@ -86,15 +86,6 @@ const Index = () => {
           className="text-muted-foreground hover:text-foreground"
         >
           <Settings className="w-4 h-4" />
-        </Button>
-        <Button 
-          variant="ghost" 
-          size="icon" 
-          onClick={() => setFeedbackOpen(true)}
-          className="text-muted-foreground hover:text-foreground"
-          title="Send Feedback"
-        >
-          <MessageCircle className="w-4 h-4" />
         </Button>
       </div>
       <div className="absolute top-4 right-4 z-10">
@@ -108,7 +99,7 @@ const Index = () => {
           Logout
         </Button>
       </div>
-      <ChatInterface />
+      <ChatInterface onFeedbackClick={() => setFeedbackOpen(true)} />
       <FeedbackDialog open={feedbackOpen} onOpenChange={setFeedbackOpen} />
     </div>
   );

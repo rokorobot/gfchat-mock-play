@@ -7,7 +7,7 @@ import { useToast } from '@/components/ui/use-toast';
 import { useTextToSpeech } from '@/hooks/useTextToSpeech';
 import { useSettings } from '@/hooks/useSettings';
 import { Button } from '@/components/ui/button';
-import { Heart, RotateCcw } from 'lucide-react';
+import { Heart, RotateCcw, MessageCircle } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import gfAvatar from '@/assets/gf-avatar.png';
 import maleAvatar from '@/assets/male-avatar.png';
@@ -19,7 +19,11 @@ interface Message {
   timestamp: Date;
 }
 
-export const ChatInterface: React.FC = () => {
+interface ChatInterfaceProps {
+  onFeedbackClick?: () => void;
+}
+
+export const ChatInterface: React.FC<ChatInterfaceProps> = ({ onFeedbackClick }) => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [isTyping, setIsTyping] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
@@ -300,6 +304,19 @@ export const ChatInterface: React.FC = () => {
         >
           <RotateCcw className="h-4 w-4" />
         </Button>
+        
+        {/* Feedback button positioned at lower left corner */}
+        {onFeedbackClick && (
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={onFeedbackClick}
+            className="absolute bottom-4 left-4 h-8 w-8 rounded-full bg-background/80 backdrop-blur-sm hover:bg-background/90"
+            title="Send Feedback"
+          >
+            <MessageCircle className="h-4 w-4" />
+          </Button>
+        )}
       </div>
 
       {/* Messages */}
