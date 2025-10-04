@@ -320,7 +320,8 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({ onFeedbackClick })
       </div>
 
       {/* Messages */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-1">
+      <div className="flex-1 overflow-y-auto p-4 space-y-1 flex justify-center">
+        <div className="w-full max-w-4xl">
         {isLoading ? (
           <div className="flex items-center justify-center h-32">
             <div className="text-muted-foreground">Loading your conversation...</div>
@@ -341,6 +342,7 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({ onFeedbackClick })
             <div ref={messagesEndRef} />
           </>
         )}
+        </div>
       </div>
 
       {/* Input */}
