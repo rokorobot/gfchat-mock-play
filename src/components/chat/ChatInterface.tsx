@@ -29,6 +29,7 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({ onFeedbackClick })
   const [isLoading, setIsLoading] = useState(true);
   const [lastAiMessageId, setLastAiMessageId] = useState<string>('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const previousGenderRef = useRef<'male' | 'female'>();
   const { user } = useAuth();
   const { toast } = useToast();
   const { speak, isLoading: isSpeaking } = useTextToSpeech();
@@ -52,6 +53,14 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({ onFeedbackClick })
   useEffect(() => {
     scrollToBottom();
   }, [messages, isTyping]);
+
+  // Reset chat when AI gender changes
+  useEffect(() => {
+    if (!isLoading && previousGenderRef.current && previousGenderRef.current !== settings.aiGender) {
+      handleResetChat();
+    }
+    previousGenderRef.current = settings.aiGender;
+  }, [settings.aiGender, isLoading]);
 
   // Auto-speak new AI responses
   useEffect(() => {
