@@ -41,6 +41,48 @@ export type Database = {
         }
         Relationships: []
       }
+      leads: {
+        Row: {
+          connection_type: string | null
+          created_at: string
+          id: string
+          language: string | null
+          match_name: string | null
+          preferred_style: string | null
+          source: string | null
+          token: string
+          tone: string | null
+          topics: string | null
+          updated_at: string
+        }
+        Insert: {
+          connection_type?: string | null
+          created_at?: string
+          id?: string
+          language?: string | null
+          match_name?: string | null
+          preferred_style?: string | null
+          source?: string | null
+          token: string
+          tone?: string | null
+          topics?: string | null
+          updated_at?: string
+        }
+        Update: {
+          connection_type?: string | null
+          created_at?: string
+          id?: string
+          language?: string | null
+          match_name?: string | null
+          preferred_style?: string | null
+          source?: string | null
+          token?: string
+          tone?: string | null
+          topics?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       messages: {
         Row: {
           content: string
