@@ -1,5 +1,5 @@
-import "https://deno.land/x/xhr@0.1.0/mod.ts";
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { serve } from "https://deno.land/std@0.177.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -12,23 +12,57 @@ serve(async (req) => {
     return new Response('ok', { headers: corsHeaders });
   }
 
+  if (req.method !== "POST") {
+    return new Response(JSON.stringify({ error: "Method not allowed" }), {
+      status: 405,
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+  }
+
   try {
-    // Your matchmaker logic here
-    
-    return new Response(
-      JSON.stringify({ message: 'Matchmaker function ready' }),
-      {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      },
+    const body = await req.json();
+
+    const supabase = createClient(
+      Deno.env.get("SUPABASE_URL")!,
+      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
     );
-  } catch (error) {
-    console.error('Error in matchmaker function:', error);
+
+    const { token, preferred_style, connection_type, topics, tone, match_name, language } = body;
+
+    const { data, error } = await supabase
+      .from("leads")
+      .insert([
+        {
+          token,
+          preferred_style,
+          connection_type,
+          topics,
+          tone,
+          match_name,
+          language,
+          source: "chatgpt_matchmaker",
+          created_at: new Date().toISOString(),
+        },
+      ])
+      .select();
+
+    if (error) throw error;
+
+    return new Response(JSON.stringify({ success: true, data }), {
+      status: 200,
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+  } catch (err) {
+    console.error("Error in /matchmaker:", err);
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({
+        success: false,
+        error: err.message ?? "Unknown error",
+      }),
       {
         status: 500,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      },
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      }
     );
   }
 });
