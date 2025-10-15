@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Loader2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 export default function Continue() {
   const navigate = useNavigate();
@@ -11,7 +12,16 @@ export default function Continue() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [match, setMatch] = useState<any>(null);
+  const [user, setUser] = useState<any>(null);
 
+  // Fetch authenticated user if any
+  useEffect(() => {
+    supabase.auth.getUser().then(({ data }) => {
+      setUser(data?.user || null);
+    });
+  }, []);
+
+  // Fetch lead (match preferences) from Supabase
   useEffect(() => {
     if (!token) {
       setError("No token provided.");
@@ -19,7 +29,7 @@ export default function Continue() {
       return;
     }
 
-    const fetchMatch = async () => {
+    const fetchLead = async () => {
       try {
         const { data, error } = await supabase
           .from("leads")
@@ -27,32 +37,33 @@ export default function Continue() {
           .eq("token", token)
           .maybeSingle();
 
-        if (error) {
-          console.error("Error fetching match:", error);
-          setError("Unable to load your match. Please try again.");
-        } else if (!data) {
+        if (error || !data) {
           setError("No match found for this token.");
-        } else {
-          setMatch(data);
+          return;
+        }
 
-          // Store match data for the chat to use
-          localStorage.setItem("gfchat_match", JSON.stringify(data));
+        setMatch(data);
+        localStorage.setItem("gfchat_match", JSON.stringify(data));
+        localStorage.setItem("gfchat_match_token", token);
 
-          // Redirect to chat after showing the match
-          setTimeout(() => {
-            navigate("/chat");
-          }, 2000);
+        // If user is logged in, link this lead to their account
+        if (user) {
+          await supabase
+            .from("leads")
+            .update({ user_id: user.id })
+            .eq("token", token);
+          // Redirect straight to chat
+          setTimeout(() => navigate("/chat"), 1500);
         }
       } catch (err: any) {
-        console.error("Error in fetchMatch:", err);
         setError(err.message || "An unexpected error occurred.");
       } finally {
         setLoading(false);
       }
     };
 
-    fetchMatch();
-  }, [token, navigate]);
+    fetchLead();
+  }, [token, user, navigate]);
 
   if (loading) {
     return (
@@ -67,39 +78,50 @@ export default function Continue() {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-background to-secondary/20 px-4 text-center">
         <p className="text-xl text-destructive mb-4">{error}</p>
-        <button
-          onClick={() => navigate("/")}
-          className="px-6 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors"
-        >
+        <Button onClick={() => navigate("/")}>
           Go Home
-        </button>
+        </Button>
       </div>
     );
   }
 
+  // If user is not logged in — show match preview + join link
+  if (!user && match) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-background to-secondary/20 px-4 text-center">
+        <h1 className="text-3xl font-semibold mb-3 text-foreground">
+          Meet {match.match_name} 💞
+        </h1>
+        <div className="space-y-2 mb-6 text-foreground/80">
+          <p>
+            <span className="font-medium">Style:</span> {match.preferred_style} — <span className="font-medium">Connection:</span> {match.connection_type}
+          </p>
+          <p>
+            <span className="font-medium">Topics she loves:</span> {match.topics}
+          </p>
+          {match.tone && (
+            <p>
+              <span className="font-medium">Tone:</span> {match.tone}
+            </p>
+          )}
+        </div>
+        <p className="mb-6 text-lg text-foreground">
+          She's ready to start chatting with you!
+        </p>
+        <Button onClick={() => navigate("/auth")} size="lg">
+          Join GF.Chat to continue →
+        </Button>
+      </div>
+    );
+  }
+
+  // If user is logged in — redirecting handled in useEffect
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-background to-secondary/20 px-4 text-center">
-      <h1 className="text-3xl font-semibold mb-6 text-foreground">Welcome back 💞</h1>
-      {match && (
-        <div className="space-y-3 text-foreground/80">
-          <p className="text-xl">
-            Your match: <strong className="text-primary">{match.match_name}</strong>
-          </p>
-          {match.preferred_style && (
-            <p>Style: <span className="font-medium">{match.preferred_style}</span></p>
-          )}
-          {match.connection_type && (
-            <p>Connection: <span className="font-medium">{match.connection_type}</span></p>
-          )}
-          {match.topics && (
-            <p>Topics: <span className="font-medium">{match.topics}</span></p>
-          )}
-          {match.tone && (
-            <p>Tone: <span className="font-medium">{match.tone}</span></p>
-          )}
-          <p className="text-sm mt-6 text-muted-foreground">Redirecting you to chat...</p>
-        </div>
-      )}
+      <h2 className="text-2xl mb-2 text-foreground">
+        Loading your chat with {match?.match_name} 💞
+      </h2>
+      <p className="text-muted-foreground">Please wait...</p>
     </div>
   );
 }
