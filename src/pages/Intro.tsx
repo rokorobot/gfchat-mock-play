@@ -1,13 +1,27 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/context/AuthContext";
 
 export default function Intro() {
   const navigate = useNavigate();
+  const { isAuthenticated, isLoading } = useAuth();
+
+  // Redirect authenticated users directly to chat
+  useEffect(() => {
+    if (!isLoading && isAuthenticated) {
+      navigate('/chat');
+    }
+  }, [isAuthenticated, isLoading, navigate]);
 
   const handleStart = () => {
     navigate('/auth');
   };
+
+  // Show nothing while checking auth to avoid flash
+  if (isLoading) {
+    return null;
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-pink-50 to-white flex items-center justify-center p-6">
