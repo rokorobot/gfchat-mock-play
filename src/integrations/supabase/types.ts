@@ -54,6 +54,7 @@ export type Database = {
           tone: string | null
           topics: string | null
           updated_at: string
+          user_id: string | null
         }
         Insert: {
           connection_type?: string | null
@@ -67,6 +68,7 @@ export type Database = {
           tone?: string | null
           topics?: string | null
           updated_at?: string
+          user_id?: string | null
         }
         Update: {
           connection_type?: string | null
@@ -80,6 +82,7 @@ export type Database = {
           tone?: string | null
           topics?: string | null
           updated_at?: string
+          user_id?: string | null
         }
         Relationships: []
       }
