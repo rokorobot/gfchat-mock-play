@@ -22,7 +22,7 @@ export const Auth: React.FC = () => {
     setLoading(true);
 
     try {
-      const { error } = await supabase.auth.signInWithPassword({
+      const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
@@ -34,6 +34,24 @@ export const Auth: React.FC = () => {
           variant: "destructive",
         });
       } else {
+        const user = data?.user;
+        
+        // Link saved AI match to logged-in user
+        if (user) {
+          const token = localStorage.getItem("gfchat_match_token");
+          if (token) {
+            try {
+              await supabase
+                .from("leads")
+                .update({ user_id: user.id })
+                .eq("token", token);
+              console.log(`Linked AI match token to user ${user.id}`);
+            } catch (linkError) {
+              console.error("Failed to link match:", linkError);
+            }
+          }
+        }
+        
         toast({
           title: "Welcome back!",
           description: "You've been signed in successfully.",
@@ -100,7 +118,7 @@ export const Auth: React.FC = () => {
     try {
       const redirectUrl = `${window.location.origin}/chat`;
       
-      const { error } = await supabase.auth.signUp({
+      const { data, error } = await supabase.auth.signUp({
         email,
         password,
         options: {
@@ -123,6 +141,24 @@ export const Auth: React.FC = () => {
           });
         }
       } else {
+        const user = data?.user;
+        
+        // Link saved AI match to new user account
+        if (user) {
+          const token = localStorage.getItem("gfchat_match_token");
+          if (token) {
+            try {
+              await supabase
+                .from("leads")
+                .update({ user_id: user.id })
+                .eq("token", token);
+              console.log(`Linked AI match token to new user ${user.id}`);
+            } catch (linkError) {
+              console.error("Failed to link match:", linkError);
+            }
+          }
+        }
+        
         toast({
           title: "Account created!",
           description: "Check your email to confirm your account.",
